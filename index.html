@@ -3,132 +3,1057 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRODRIVE Compliance</title>
+  <title>PRODRIVE Compliance – SMS Builder</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
- <link rel="stylesheet" href="css/style.css">
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ============ DESIGN SYSTEM ============ */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-glow: rgba(37, 99, 235, 0.18);
+      --dark: #0f172a;
+      --dark2: #1e293b;
+      --light-bg: #f8fafc;
+      --soft: #eef4ff;
+      --muted: #64748b;
+      --card-radius: 20px;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--light-bg);
+      color: #1e293b;
+      margin: 0;
+    }
+
+    h1, h2, h3, h4, .brand-title, .section-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* ============ TOPBAR ============ */
+    .topbar {
+      background: var(--dark);
+      color: white;
+      font-size: 13px;
+    }
+    .topbar a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color .2s; }
+    .topbar a:hover { color: white; }
+
+    /* ============ NAVBAR ============ */
+    .navbar {
+      background: white;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin: 0;
+      letter-spacing: .5px;
+    }
+    .nav-link {
+      font-weight: 500;
+      color: #374151 !important;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: all .2s;
+    }
+    .nav-link:hover { color: var(--primary) !important; background: var(--soft); }
+
+    /* Profile avatar */
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .profile-dropdown {
+      min-width: 240px;
+      border-radius: 16px !important;
+      overflow: hidden;
+    }
+    .profile-dropdown .dropdown-item {
+      font-size: 14px;
+      border-radius: 8px;
+      margin: 2px 6px;
+      padding: 8px 12px !important;
+      width: calc(100% - 12px);
+      transition: background .15s;
+    }
+    .profile-dropdown .dropdown-item:hover { background: var(--soft); }
+
+    /* ============ HERO ============ */
+    .hero {
+      background: linear-gradient(140deg, #06142e 0%, #0f3d91 60%, #0c2461 100%);
+      color: white;
+      padding: 96px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      right: -100px;
+      top: -100px;
+      background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #7dd3fc;
+      margin-bottom: 18px;
+      background: rgba(125, 211, 252, 0.1);
+      border: 1px solid rgba(125, 211, 252, 0.2);
+      padding: 6px 16px;
+      border-radius: 40px;
+    }
+    .hero h1 {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 22px;
+    }
+    .hero h1 span { color: #7dd3fc; }
+    .hero p {
+      font-size: 18px;
+      color: #cbd5e1;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .btn-hero-primary {
+      background: white;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: none;
+      text-decoration: none;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .25s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); color: var(--primary-dark); }
+    .btn-hero-outline {
+      background: transparent;
+      color: white;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      text-decoration: none;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .25s;
+    }
+    .btn-hero-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); color: white; }
+
+    /* Hero trust badges */
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .hero-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .hero-trust-item i { color: #10b981; font-size: 16px; }
+
+    /* Dashboard Card */
+    .glass-wrap {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .dashboard-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .stat-box {
+      border-radius: 14px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-box::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: -10px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+    }
+    .stat-box small { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; opacity: .7; }
+    .stat-box h3 { font-family: inherit; font-size: 28px; font-weight: 800; margin: 4px 0 0; }
+    .analytics-box {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 16px;
+    }
+    .bar-area { height: 100px; display: flex; align-items: flex-end; gap: 8px; }
+    .bar {
+      flex: 1;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(180deg, #60a5fa, var(--primary));
+      transition: height .3s ease;
+      position: relative;
+    }
+    .bar:hover { opacity: .85; cursor: pointer; }
+    .compliance-score {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 14px;
+      padding: 14px;
+      color: white;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .score-badge {
+      background: rgba(255,255,255,0.2);
+      border-radius: 50px;
+      padding: 4px 14px;
+      font-size: 22px;
+      font-weight: 800;
+      font-family: inherit;
+    }
+
+    /* ============ SECTIONS ============ */
+    .section { padding: 90px 0; }
+
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--soft);
+      padding: 6px 16px;
+      border-radius: 40px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+    .section-desc { color: var(--muted); max-width: 660px; margin: 0 auto; font-size: 16px; line-height: 1.7; }
+
+    /* Service Cards */
+    .custom-card {
+      border: 1px solid #e2e8f0;
+      border-radius: var(--card-radius);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      transition: all .3s;
+    }
+    .custom-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.12);
+      border-color: #bfdbfe;
+    }
+    .service-icon {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: var(--soft);
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    /* Pricing */
+    .pricing-card { border: 2px solid #e2e8f0; transition: all .3s; }
+    .pricing-card:hover { border-color: #bfdbfe; box-shadow: 0 16px 40px rgba(37,99,235,0.1); }
+    .pricing-card.featured {
+      background: linear-gradient(160deg, #ffffff, #eff6ff);
+      border-color: var(--primary);
+      position: relative;
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 20px;
+      border-radius: 40px;
+      white-space: nowrap;
+    }
+    .pricing-price {
+      font-family: inherit;
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .pricing-price sup { font-size: 20px; top: -12px; position: relative; }
+    .pricing-price span { font-size: 16px; color: var(--muted); font-weight: 400; font-family: inherit; }
+    .pricing-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .pricing-feature i { color: var(--success); font-size: 15px; }
+    .pricing-feature.disabled i { color: #cbd5e1; }
+    .pricing-feature.disabled span { color: #cbd5e1; text-decoration: line-through; }
+
+    /* Coverage */
+    .coverage-card {
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      padding: 28px;
+      background: white;
+      transition: all .3s;
+      height: 100%;
+    }
+    .coverage-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 12px 32px rgba(37,99,235,0.1);
+      transform: translateY(-3px);
+    }
+    .coverage-num {
+      font-family: inherit;
+      font-size: 36px;
+      font-weight: 800;
+      color: #e2e8f0;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    /* Why Us */
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: white;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+      font-weight: 500;
+      transition: all .25s;
+    }
+    .feature-item:hover { border-color: #bfdbfe; background: var(--soft); }
+    .feature-item i { font-size: 20px; color: var(--primary); flex-shrink: 0; }
+
+    /* Reviews */
+    .review-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .stars { color: #f59e0b; font-size: 14px; letter-spacing: 1px; }
+    .review-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(37,99,235,0.1) !important; }
+
+    /* ============ FOOTER STYLES ============ */
+    .footer-main { background: var(--dark); color: #cbd5e1; }
+
+    .footer-brand-title {
+      font-family: inherit;
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+      line-height: 1;
+    }
+    .footer-brand-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .footer-tagline { color: #94a3b8; line-height: 1.7; }
+
+    .footer-contact-items { display: flex; flex-direction: column; gap: 12px; }
+    .footer-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color .2s;
+    }
+    .footer-contact-item:hover { color: white; }
+    .footer-contact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: #60a5fa;
+      flex-shrink: 0;
+    }
+
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .footer-social-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+
+    /* Footer Form Card */
+    .footer-form-card {
+      background: white;
+      border-radius: 22px;
+      padding: 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      color: #1e293b;
+    }
+    .form-group-custom { margin-bottom: 0; }
+    .form-label-custom { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 15px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    textarea ~ .input-icon, .form-textarea-custom { } /* no icon centering needed for textarea */
+    .form-input-custom {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #1e293b;
+      background: #f8fafc;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      appearance: none;
+    }
+    .form-input-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: white; }
+    .form-input-custom.input-error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
+    .form-input-custom.input-ok { border-color: #10b981; }
+    .form-textarea-custom { padding: 12px 14px; resize: vertical; min-height: 100px; }
+    .form-select-custom { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .field-error { font-size: 12px; color: #ef4444; margin-top: 4px; display: none; }
+    .field-error.visible { display: block; }
+    .char-count { font-size: 11px; color: #94a3b8; margin-top: 4px; flex-shrink: 0; }
+    .alert-success-custom {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 14px;
+      padding: 18px 22px;
+      color: #065f46;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .btn-submit-custom {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all .25s;
+      font-family: inherit;
+    }
+    .btn-submit-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+    .btn-submit-custom:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+    /* Footer bottom */
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer-bottom { color: #64748b; font-size: 13px; }
+    .footer-links a { color: #64748b; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .footer-links a:hover { color: #94a3b8; }
+
+    .logo-badge { height: 44px; background: white; border-radius: 12px; padding: 6px 12px; object-fit: contain; }
+    .membership-strip { background: #020617; }
+    .membership-logo { height: 52px; background: white; border-radius: 12px; padding: 6px 14px; object-fit: contain; }
+    .letter-spacing-1 { letter-spacing: 1.5px; }
+
+    /* ============ AI CHATBOT ============ */
+    .chat-launcher {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 1060;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .chat-bubble-btn {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #1e40af);
+      border: none;
+      color: white;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(37,99,235,0.4);
+      transition: all .25s;
+      position: relative;
+    }
+    .chat-bubble-btn:hover { transform: scale(1.08); box-shadow: 0 12px 36px rgba(37,99,235,0.5); }
+    .chat-bubble-btn .chat-ping {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid white;
+      animation: ping 1.5s ease-in-out infinite;
+    }
+    @keyframes ping {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: .7; }
+    }
+
+    .chat-window {
+      width: 360px;
+      max-height: 520px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.85) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .chat-window.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), #1e40af);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+    }
+    .chat-header-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .chat-header-info strong { display: block; font-size: 15px; font-weight: 700; }
+    .chat-header-info small { font-size: 12px; opacity: .8; }
+    .chat-header-status { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .chat-close { margin-left: auto; background: none; border: none; color: white; font-size: 20px; cursor: pointer; opacity: .7; transition: opacity .2s; padding: 0; }
+    .chat-close:hover { opacity: 1; }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f8fafc;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+    .msg { max-width: 82%; }
+    .msg-bot { align-self: flex-start; }
+    .msg-user { align-self: flex-end; }
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .msg-bot .msg-bubble {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px 18px 18px 18px;
+      color: #1e293b;
+    }
+    .msg-user .msg-bubble {
+      background: linear-gradient(135deg, var(--primary), #1e40af);
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+    }
+    .msg-time { font-size: 11px; color: #94a3b8; margin-top: 4px; padding: 0 4px; }
+    .msg-user .msg-time { text-align: right; }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px 18px 18px 18px;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typingBounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    .chat-quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 20px 12px;
+      background: #f8fafc;
+    }
+    .quick-reply-btn {
+      background: white;
+      border: 1.5px solid #dbeafe;
+      color: var(--primary);
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+    }
+    .quick-reply-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .chat-input-area {
+      padding: 14px 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 8px;
+      background: white;
+    }
+    .chat-input {
+      flex: 1;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 50px;
+      padding: 10px 18px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+    .chat-input:focus { border-color: var(--primary); }
+    .chat-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+    .chat-send-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+    /* ============ UTILITY ============ */
+    .btn-primary { background: var(--primary); border-color: var(--primary); font-weight: 600; }
+    .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+    .btn-outline-primary { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+    .btn-outline-primary:hover { background: var(--primary); color: white; }
+
+    /* ---- Hero video ---- */
+    .hero-video-wrap {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+      border: 2px solid rgba(255,255,255,0.12);
+    }
+    .hero-video-wrap iframe { display: block; }
+
+    /* ---- Simple contact form ---- */
+    .simple-form-card {
+      background: transparent;
+      padding: 0;
+      color: #cbd5e1;
+    }
+    .simple-form-card h4 { color: white; }
+    .simple-input {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      font-size: 14px;
+      color: white;
+      background: rgba(255,255,255,0.07);
+      outline: none;
+      transition: border-color .2s, background .2s;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .simple-input::placeholder { color: rgba(255,255,255,0.35); }
+    .simple-input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.11); }
+    .simple-input.err { border-color: #f87171; }
+    .simple-error {
+      font-size: 12px;
+      color: #f87171;
+      margin-top: 3px;
+      display: none;
+    }
+    .simple-error.show { display: block; }
+    .simple-submit-btn {
+      width: 100%;
+      padding: 11px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s;
+    }
+    .simple-submit-btn:hover { background: var(--primary-dark); }
+    .simple-submit-btn:disabled { opacity: .7; cursor: not-allowed; }
+    .simple-success {
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.4);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #6ee7b7;
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .simple-form-card .form-check-label { color: #94a3b8; }
+    .simple-form-card .form-check-label a { color: #60a5fa; }
+
+    /* ===== TABLET (≤991px) ===== */
+    @media (max-width: 991px) {
+      /* Hero */
+      .hero { padding: 70px 0 60px; }
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 16px; }
+
+      /* Nav */
+      .navbar-collapse { background: white; border-radius: 16px; padding: 16px; margin-top: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+      #authButtons { flex-direction: row; }
+
+      /* Sections */
+      .section { padding: 70px 0; }
+      .section-title { font-size: 30px; }
+
+      /* Footer layout */
+      .footer-main .row.g-5 { --bs-gutter-y: 2rem; }
+
+      /* Chat */
+      .chat-window { width: 320px; }
+    }
+
+    /* ===== MOBILE (≤767px) ===== */
+    @media (max-width: 767px) {
+      /* Topbar */
+      .topbar { font-size: 12px; text-align: center; }
+      .topbar .container { gap: 6px; }
+
+      /* Navbar */
+      .brand-title { font-size: 22px; }
+      .brand-subtitle { font-size: 10px; }
+      .navbar-collapse { margin-top: 8px; }
+      .navbar-nav .nav-link { padding: 10px 12px !important; border-radius: 10px; }
+      #authButtons { margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; }
+      #authButtons a { flex: 1; text-align: center; }
+
+      /* Hero */
+      .hero { padding: 56px 0 48px; text-align: center; }
+      .hero h1 { font-size: 28px; line-height: 1.2; }
+      .hero p { font-size: 15px; margin-left: auto; margin-right: auto; }
+      .hero-badge { font-size: 11px; }
+      .hero-cta-group { justify-content: center; }
+      .btn-hero-primary, .btn-hero-outline { width: 100%; justify-content: center; padding: 13px 20px; font-size: 14px; }
+      .hero-trust { justify-content: center; gap: 12px; }
+      .hero-trust-item { font-size: 12px; }
+      .carousel-indicators { justify-content: center !important; }
+
+      /* Sections */
+      .section { padding: 56px 0; }
+      .section-title { font-size: 26px; }
+      .section-desc { font-size: 14px; }
+      .section-eyebrow { font-size: 11px; }
+
+      /* Service / Coverage cards */
+      .custom-card .card-body { padding: 20px !important; }
+      .coverage-card { padding: 20px; }
+      .coverage-num { font-size: 28px; }
+
+      /* Pricing */
+      .pricing-price { font-size: 34px; }
+      .pricing-card .card-body { padding: 24px 20px !important; }
+
+      /* Feature list */
+      .feature-item { padding: 13px 16px; font-size: 14px; }
+
+      /* Why us video */
+      #why-us .ratio { border-radius: 16px !important; }
+
+      /* Reviews */
+      .review-avatar { width: 40px; height: 40px; font-size: 16px; }
+
+      /* Footer */
+      .footer-main { padding-top: 2rem !important; }
+      .footer-main .container.py-5 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+      .footer-brand-title { font-size: 24px; }
+      .footer-contact-item { font-size: 13px; }
+      .footer-socials { gap: 8px; }
+      .footer-social-btn { width: 34px; height: 34px; font-size: 14px; }
+      .footer-bottom .d-flex { flex-direction: column; text-align: center; gap: 10px; }
+      .footer-links { justify-content: center; flex-wrap: wrap; gap: 12px; }
+      .logo-badge { height: 36px; }
+      .membership-logo { height: 40px; }
+
+      /* Contact form */
+      .simple-form-card h4 { font-size: 18px; }
+      .simple-input { font-size: 13px; padding: 9px 11px; }
+
+      /* Chat */
+      .chat-launcher { right: 14px; bottom: 14px; }
+      .chat-window { width: calc(100vw - 28px); max-height: 80vh; }
+      .chat-bubble-btn { width: 54px; height: 54px; font-size: 22px; }
+    }
+
+    /* ===== SMALL MOBILE (≤480px) ===== */
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 24px; }
+      .section-title { font-size: 22px; }
+      .hero-cta-group { flex-direction: column; }
+      .hero-trust { flex-direction: column; align-items: center; gap: 8px; }
+      .pricing-price { font-size: 30px; }
+      .container { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- ========== TOOLBAR ========== -->
   <div class="topbar py-2">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-      <div>
-        <i class="bi bi-telephone-fill me-2"></i>+61 4XX XXX XXX
-        <span class="mx-2">|</span>
-        <i class="bi bi-envelope-fill me-2"></i>info@prodrivecompliance.com
-      </div>
       <div class="d-flex align-items-center gap-3">
-        <a href="#"><i class="bi bi-facebook"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
-        <a href="#"><i class="bi bi-instagram"></i></a>
-        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <span><i class="bi bi-telephone-fill me-2"></i>+61 4XX XXX XXX</span>
+        <span class="d-none d-md-inline" style="color:#475569">|</span>
+        <span class="d-none d-md-inline"><i class="bi bi-envelope-fill me-2"></i>info@prodrivecompliance.com</span>
+      </div>
+      <div class="d-none d-sm-flex align-items-center gap-3">
+        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" aria-label="Twitter/X"><i class="bi bi-twitter-x"></i></a>
       </div>
     </div>
   </div>
 
   <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container py-2">
-      <a class="navbar-brand" href="#home">
-        <div class="brand-title">PRODRIVE</div>
-        <p class="brand-subtitle">SMS Builder</p>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#home">
+  <img src="images/logo.png" alt="ProDrive Logo" style="height:60px;">
+  <div>
+    <div class="brand-title mb-0" >PRODRIVE</div>
+    <small class="brand-subtitle">SMS Builder</small>
+  </div>
+</a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="mainNavbar">
-        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-            <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
-          <li class="nav-item"><a class="nav-link" href="#compliance-coverage">Coverage</a></li>
-        
-          <li class="nav-item"><a class="nav-link" href="#why-us">Why Choose Us</a></li>
-          <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <li class="nav-item mt-2 mt-lg-0 ms-lg-2">
-            <a href="#" class="btn btn-primary me-2">Sign In</a>
-            <a href="#" class="btn btn-outline-primary">Sign Up</a>
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link px-3" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#pricing">Pricing</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#compliance-coverage">Coverage</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#why-us">Why Us</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#reviews">Reviews</a></li>
+          <li class="nav-item"><a class="nav-link px-3" href="#contact">Contact</a></li>
+
+          <!-- Auth Buttons (logged out) -->
+          <li class="nav-item mt-2 mt-lg-0 ms-lg-2 d-flex gap-2 align-items-center" id="authButtons">
+            <a href="signin.html" class="btn btn-primary btn-sm px-3">Sign In</a>
+            <a href="signup.html" class="btn btn-outline-primary btn-sm px-3">Sign Up</a>
+          </li>
+
+          <!-- Profile Dropdown (logged in — remove d-none to activate) -->
+          <li class="nav-item dropdown mt-2 mt-lg-0 ms-lg-2 d-none" id="profileMenu">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
+              <span class="fw-semibold small d-none d-lg-inline" id="profileName">My Company</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end profile-dropdown shadow-lg border-0 mt-2">
+              <li>
+                <div class="px-4 py-3 border-bottom">
+                  <div class="fw-bold" id="profileCompany">ACME Transport</div>
+                  <div class="small text-muted" id="profileEmail">admin@acme.com</div>
+                </div>
+              </li>
+              <li><a class="dropdown-item py-2" href="#"><i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard</a></li>
+              <li><a class="dropdown-item py-2" href="#"><i class="bi bi-building me-2 text-primary"></i>Company Profile</a></li>
+              <li><a class="dropdown-item py-2" href="#"><i class="bi bi-file-earmark-text me-2 text-primary"></i>My Documents</a></li>
+              <li><a class="dropdown-item py-2" href="#"><i class="bi bi-bell me-2 text-primary"></i>Notifications <span class="badge bg-danger ms-1">3</span></a></li>
+              <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2 text-primary"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item py-2 text-danger" href="signin.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+            </ul>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
+  <!-- ========== HERO ========== -->
   <section class="hero" id="home">
     <div class="container position-relative">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <span class="hero-badge">Web-Based Compliance Platform</span>
-          <h1>Smarter Safety Management for Heavy Vehicle Operations</h1>
-          <p>
-            Build, manage, and monitor Safety Management System documents with a professional,
-            responsive, and user-friendly web platform.
-          </p>
-          <div class="d-flex flex-wrap gap-3 mb-4">
-            <a href="get-started.html" class="btn btn-light btn-lg px-4">Get Started</a>
-           
+          <span class="hero-badge"><i class="bi bi-shield-check"></i>Web-Based Compliance Platform</span>
+          <h1>Smarter Safety Management for <span>Heavy Vehicle</span> Operations</h1>
+          <p>Build, manage, and monitor Safety Management System documents with a professional, responsive, and user-friendly web platform.</p>
+          <div class="hero-cta-group">
+            <a href="form.html" class="btn-hero-primary"><i class="bi bi-rocket-takeoff-fill"></i>Get Started Free</a>
+            <a href="#services" class="btn-hero-outline"><i class="bi bi-play-circle"></i>See How It Works</a>
           </div>
-          <div id="heroSlider" class="carousel slide" data-bs-ride="carousel">
+          <div class="hero-trust">
+            <div class="hero-trust-item"><i class="bi bi-check-circle-fill"></i>No credit card required</div>
+            <div class="hero-trust-item"><i class="bi bi-check-circle-fill"></i>NHVR aligned</div>
+            <div class="hero-trust-item"><i class="bi bi-check-circle-fill"></i>Setup in 15 minutes</div>
+          </div>
+          <div id="heroSlider" class="carousel slide mt-5" data-bs-ride="carousel">
             <div class="carousel-indicators position-static justify-content-start m-0 mb-3">
-              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="0" class="active"></button>
-              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="1"></button>
-              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="2"></button>
+              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="0" class="active" style="background:rgba(255,255,255,0.5); width:24px; height:4px; border-radius:4px; border:none;"></button>
+              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="1" style="background:rgba(255,255,255,0.3); width:24px; height:4px; border-radius:4px; border:none;"></button>
+              <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="2" style="background:rgba(255,255,255,0.3); width:24px; height:4px; border-radius:4px; border:none;"></button>
             </div>
-            <div class="carousel-inner rounded-4 overflow-hidden">
+            <div class="carousel-inner rounded-4 overflow-hidden" style="border: 2px solid rgba(255,255,255,0.1)">
               <div class="carousel-item active">
-                <img src="images/slider-1.jpg" class="d-block w-100" alt="Compliance dashboard preview" style="height:260px; object-fit:cover;">
+                <img src="images/c1.jpg" class="d-block w-100" alt="Compliance dashboard" style="height:clamp(160px,30vw,240px);object-fit:cover;">
               </div>
               <div class="carousel-item">
-                <img src="images/slider-2.jpg" class="d-block w-100" alt="Fleet safety management" style="height:260px; object-fit:cover;">
+                <img src="images/c2.jpeg" class="d-block w-100" alt="Fleet safety management" style="height:clamp(160px,30vw,240px);object-fit:cover;">
               </div>
               <div class="carousel-item">
-                <img src="images/slider-3.jpg" class="d-block w-100" alt="Heavy vehicle compliance workflow" style="height:260px; object-fit:cover;">
+                <img src="images/c1.jpg" class="d-block w-100" alt="Compliance workflow" style="height:clamp(160px,30vw,240px);object-fit:cover;">
               </div>
             </div>
           </div>
         </div>
         <div class="col-lg-6">
-          <div class="glass-wrap">
-            <div class="card custom-card">
-              <div class="card-body p-4 p-lg-5">
-                <h4 class="fw-bold mb-4">Dashboard Preview</h4>
-                <div class="row g-3 mb-4">
-                  <div class="col-6">
-                    <div class="stat-box bg-primary bg-opacity-10">
-                      <small class="text-muted d-block">Policies</small>
-                      <h3 class="fw-bold mb-0">24</h3>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="stat-box bg-success bg-opacity-10">
-                      <small class="text-muted d-block">Drivers</small>
-                      <h3 class="fw-bold mb-0">118</h3>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="stat-box bg-warning bg-opacity-10">
-                      <small class="text-muted d-block">Audits</small>
-                      <h3 class="fw-bold mb-0">12</h3>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="stat-box bg-danger bg-opacity-10">
-                      <small class="text-muted d-block">Alerts</small>
-                      <h3 class="fw-bold mb-0">5</h3>
-                    </div>
-                  </div>
-                </div>
-                <div class="analytics-box">
-                  <div class="bar-area mb-3">
-                    <div class="bar" style="height:45px"></div>
-                    <div class="bar" style="height:75px"></div>
-                    <div class="bar" style="height:92px"></div>
-                    <div class="bar" style="height:70px"></div>
-                    <div class="bar" style="height:118px"></div>
-                    <div class="bar" style="height:88px"></div>
-                  </div>
-                  <p class="text-center text-muted mb-0">Compliance Analytics Overview</p>
-                </div>
-              </div>
+          <div class="hero-video-wrap">
+            <div class="ratio ratio-16x9">
+              <iframe
+                src="https://www.youtube.com/embed/Cm6eMeOg-KU"
+                title="PRODRIVE – Heavy Vehicle Safety Management"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
             </div>
           </div>
         </div>
@@ -136,64 +1061,66 @@
     </div>
   </section>
 
+  <!-- ========== SERVICES ========== -->
   <section class="section" id="services">
     <div class="container">
       <div class="text-center mb-5">
+        <span class="section-eyebrow">What We Offer</span>
         <h2 class="section-title">Our Services</h2>
         <p class="section-desc">A complete digital solution for compliance, document management, and heavy vehicle safety workflows.</p>
       </div>
       <div class="row g-4">
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-file-earmark-text"></i></div>
               <h4 class="fw-bold mb-3">SMS Document Builder</h4>
-              <p class="text-muted mb-0">Create structured safety management documents with guided sections and practical templates.</p>
+              <p class="text-muted mb-0">Create structured safety management documents with guided sections and practical templates tailored to heavy vehicle operations.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-shield-check"></i></div>
               <h4 class="fw-bold mb-3">Compliance Tracking</h4>
-              <p class="text-muted mb-0">Monitor policies, audits, reviews, and compliance requirements in one place.</p>
+              <p class="text-muted mb-0">Monitor policies, audits, reviews, and compliance requirements in one centralised, easy-to-navigate place.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-truck"></i></div>
               <h4 class="fw-bold mb-3">Driver &amp; Fleet Records</h4>
-              <p class="text-muted mb-0">Manage driver profiles, training status, incidents, and vehicle safety records.</p>
+              <p class="text-muted mb-0">Manage driver profiles, training status, incidents, and vehicle safety records across your entire fleet.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-exclamation-triangle"></i></div>
               <h4 class="fw-bold mb-3">Incident Reporting</h4>
-              <p class="text-muted mb-0">Submit and review incidents through a simple digital workflow.</p>
+              <p class="text-muted mb-0">Submit and review incidents through a simple digital workflow with audit-ready documentation.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-bar-chart-line"></i></div>
               <h4 class="fw-bold mb-3">Analytics Dashboard</h4>
-              <p class="text-muted mb-0">Track compliance progress, alerts, and business performance with visual summaries.</p>
+              <p class="text-muted mb-0">Track compliance progress, alerts, and business performance with real-time visual summaries.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 border-0">
             <div class="card-body p-4">
               <div class="service-icon mb-4"><i class="bi bi-person-lock"></i></div>
               <h4 class="fw-bold mb-3">Secure User Access</h4>
-              <p class="text-muted mb-0">Support admin, staff, and company login with role-based access control.</p>
+              <p class="text-muted mb-0">Admin, staff, and company logins with role-based access control to protect sensitive safety data.</p>
             </div>
           </div>
         </div>
@@ -201,201 +1128,202 @@
     </div>
   </section>
 
-    <section class="section bg-white" id="pricing">
+  <!-- ========== PRICING ========== -->
+  <section class="section bg-white" id="pricing">
     <div class="container">
       <div class="text-center mb-5">
+        <span class="section-eyebrow">Simple Pricing</span>
         <h2 class="section-title">Pricing Plans</h2>
-        <p class="section-desc">Choose a package suitable for your transport business.</p>
+        <p class="section-desc">Transparent, flexible pricing for transport businesses of all sizes. No hidden fees.</p>
       </div>
-      <div class="row g-4">
+      <div class="row g-4 justify-content-center">
         <div class="col-md-6 col-lg-4">
           <div class="card custom-card h-100 pricing-card">
             <div class="card-body p-4 p-lg-5 d-flex flex-column">
-              <h4 class="fw-bold mb-2">Starter</h4>
-              <h2 class="text-primary fw-bold mb-4">$29/mo</h2>
-              <ul class="text-muted ps-3 mb-4">
-                <li class="mb-2">Basic dashboard</li>
-                <li class="mb-2">SMS templates</li>
-                <li class="mb-2">Email support</li>
-              </ul>
-              <a href="get-started.html" class="btn btn-outline-primary mt-auto">Choose Plan</a>
+              <h4 class="fw-bold mb-1">Starter</h4>
+              <p class="text-muted small mb-3">Perfect for small operators</p>
+              <div class="pricing-price mb-4"><sup>$</sup>29<span>/mo</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Basic dashboard</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>SMS templates</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Email support</span></div>
+              <div class="pricing-feature disabled"><i class="bi bi-x-circle-fill"></i><span>Incident reporting</span></div>
+              <div class="pricing-feature disabled"><i class="bi bi-x-circle-fill"></i><span>Advanced analytics</span></div>
+              <a href="signup.html" class="btn btn-outline-primary mt-4">Get Started</a>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100 pricing-card featured">
+          <div class="card custom-card h-100 pricing-card featured position-relative">
+            <div class="pricing-badge">Most Popular</div>
             <div class="card-body p-4 p-lg-5 d-flex flex-column">
-              <span class="badge bg-primary mb-3 align-self-start">Popular</span>
-              <h4 class="fw-bold mb-2">Professional</h4>
-              <h2 class="text-primary fw-bold mb-4">$59/mo</h2>
-              <ul class="text-muted ps-3 mb-4">
-                <li class="mb-2">All Starter features</li>
-                <li class="mb-2">Incident reports</li>
-                <li class="mb-2">Compliance tracking</li>
-              </ul>
-              <a href="get-started.html" class="btn btn-primary mt-auto">Choose Plan</a>
+              <h4 class="fw-bold mb-1">Professional</h4>
+              <p class="text-muted small mb-3">For growing fleets</p>
+              <div class="pricing-price mb-4"><sup>$</sup>59<span>/mo</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>All Starter features</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Incident reports</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Compliance tracking</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Driver records</span></div>
+              <div class="pricing-feature disabled"><i class="bi bi-x-circle-fill"></i><span>Priority support</span></div>
+              <a href="signup.html" class="btn btn-primary mt-4">Get Started</a>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
           <div class="card custom-card h-100 pricing-card">
             <div class="card-body p-4 p-lg-5 d-flex flex-column">
-              <h4 class="fw-bold mb-2">Enterprise</h4>
-              <h2 class="text-primary fw-bold mb-4">$99/mo</h2>
-              <ul class="text-muted ps-3 mb-4">
-                <li class="mb-2">All Professional features</li>
-                <li class="mb-2">Advanced analytics</li>
-                <li class="mb-2">Priority support</li>
-              </ul>
-              <a href="get-started.html" class="btn btn-outline-primary mt-auto">Choose Plan</a>
+              <h4 class="fw-bold mb-1">Enterprise</h4>
+              <p class="text-muted small mb-3">Multi-fleet operations</p>
+              <div class="pricing-price mb-4"><sup>$</sup>99<span>/mo</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>All Professional features</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Advanced analytics</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Priority support</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Custom integrations</span></div>
+              <div class="pricing-feature"><i class="bi bi-check-circle-fill"></i><span>Dedicated account manager</span></div>
+              <a href="signup.html" class="btn btn-outline-primary mt-4">Get Started</a>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-  <section class="section bg-white" id="compliance-coverage">
+
+  <!-- ========== COMPLIANCE COVERAGE ========== -->
+  <section class="section" id="compliance-coverage">
     <div class="container">
       <div class="text-center mb-5">
+        <span class="section-eyebrow">What We Cover</span>
         <h2 class="section-title">Compliance Coverage</h2>
         <p class="section-desc">Our system helps businesses manage the key compliance areas required for heavy vehicle safety, operational control, and documented risk management.</p>
       </div>
       <div class="row g-4">
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-shield-lock"></i></div>
-              <h4 class="fw-bold mb-3">HVNL Alignment</h4>
-              <p class="text-muted mb-0">Support for Heavy Vehicle National Law obligations, policies, and documented procedures.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">01</div>
+            <div class="service-icon mb-3"><i class="bi bi-shield-lock"></i></div>
+            <h4 class="fw-bold mb-3">HVNL Alignment</h4>
+            <p class="text-muted mb-0">Support for Heavy Vehicle National Law obligations, policies, and documented procedures.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-diagram-3"></i></div>
-              <h4 class="fw-bold mb-3">Chain of Responsibility</h4>
-              <p class="text-muted mb-0">Capture responsibilities across schedulers, operators, drivers, and subcontractors.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">02</div>
+            <div class="service-icon mb-3"><i class="bi bi-diagram-3"></i></div>
+            <h4 class="fw-bold mb-3">Chain of Responsibility</h4>
+            <p class="text-muted mb-0">Capture responsibilities across schedulers, operators, drivers, and subcontractors.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-clipboard-data"></i></div>
-              <h4 class="fw-bold mb-3">Risk Assessments</h4>
-              <p class="text-muted mb-0">Identify hazards, assess risks, and maintain mitigation records in one system.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">03</div>
+            <div class="service-icon mb-3"><i class="bi bi-clipboard-data"></i></div>
+            <h4 class="fw-bold mb-3">Risk Assessments</h4>
+            <p class="text-muted mb-0">Identify hazards, assess risks, and maintain mitigation records in one system.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-person-badge"></i></div>
-              <h4 class="fw-bold mb-3">Driver & Staff Records</h4>
-              <p class="text-muted mb-0">Maintain licence details, inductions, training, and competency records for staff.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">04</div>
+            <div class="service-icon mb-3"><i class="bi bi-person-badge"></i></div>
+            <h4 class="fw-bold mb-3">Driver &amp; Staff Records</h4>
+            <p class="text-muted mb-0">Maintain licence details, inductions, training, and competency records for all staff.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-tools"></i></div>
-              <h4 class="fw-bold mb-3">Maintenance & Inspections</h4>
-              <p class="text-muted mb-0">Track vehicle inspections, maintenance activities, and safety check documentation.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">05</div>
+            <div class="service-icon mb-3"><i class="bi bi-tools"></i></div>
+            <h4 class="fw-bold mb-3">Maintenance &amp; Inspections</h4>
+            <p class="text-muted mb-0">Track vehicle inspections, maintenance activities, and safety check documentation.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
-            <div class="card-body p-4">
-              <div class="service-icon mb-4"><i class="bi bi-file-earmark-check"></i></div>
-              <h4 class="fw-bold mb-3">Audit Readiness</h4>
-              <p class="text-muted mb-0">Prepare evidence, reports, and document sets to support internal and external audits.</p>
-            </div>
+          <div class="coverage-card">
+            <div class="coverage-num">06</div>
+            <div class="service-icon mb-3"><i class="bi bi-file-earmark-check"></i></div>
+            <h4 class="fw-bold mb-3">Audit Readiness</h4>
+            <p class="text-muted mb-0">Prepare evidence, reports, and document sets to support internal and external audits.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-
-
-  <section class="section" id="why-us">
+  <!-- ========== WHY US ========== -->
+  <section class="section bg-white" id="why-us">
     <div class="container">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <h2 class="section-title">Why Choose Us</h2>
-          <p class="text-muted mb-4">Our system is designed for usability, compliance support, and efficient document workflows. It helps transport businesses reduce manual work and improve visibility across safety operations.</p>
+          <span class="section-eyebrow">Why PRODRIVE</span>
+          <h2 class="section-title">Built for the Road Ahead</h2>
+          <p class="text-muted mb-4" style="line-height:1.8">Our system is designed for usability, compliance support, and efficient document workflows. It helps transport businesses reduce manual work and improve visibility across safety operations.</p>
           <div class="d-grid gap-3">
-            <div class="feature-item"><i class="bi bi-check-circle-fill text-primary"></i><span>Modern responsive design</span></div>
-            <div class="feature-item"><i class="bi bi-check-circle-fill text-primary"></i><span>Easy navigation for users</span></div>
-            <div class="feature-item"><i class="bi bi-check-circle-fill text-primary"></i><span>Role-based dashboard access</span></div>
-            <div class="feature-item"><i class="bi bi-check-circle-fill text-primary"></i><span>Scalable and maintainable system</span></div>
+            <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Modern responsive design — works on any device</span></div>
+            <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Intuitive navigation designed for non-technical users</span></div>
+            <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Role-based dashboard access for your whole team</span></div>
+            <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Scalable system that grows with your fleet</span></div>
+            <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Australian compliance standards built in</span></div>
           </div>
         </div>
         <div class="col-lg-6">
-          <div class="ratio ratio-16x9 rounded-4 overflow-hidden">
-
-<iframe 
-src="https://www.youtube.com/embed/Cm6eMeOg-KU"
-title="Heavy Vehicle Safety Management Intro"
-allowfullscreen>
-
-</iframe>
-
-</div>
+          <div class="ratio ratio-16x9 rounded-4 overflow-hidden" style="box-shadow: 0 20px 60px rgba(0,0,0,0.12)">
+            <iframe src="https://www.youtube.com/embed/Cm6eMeOg-KU" title="Heavy Vehicle Safety Management" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section bg-white" id="reviews">
+  <!-- ========== REVIEWS ========== -->
+  <section class="section" id="reviews">
     <div class="container">
       <div class="text-center mb-5">
+        <span class="section-eyebrow">Testimonials</span>
         <h2 class="section-title">Client Reviews</h2>
-        <p class="section-desc">Trusted by transport and compliance-focused businesses.</p>
+        <p class="section-desc">Trusted by transport and compliance-focused businesses across Australia.</p>
       </div>
       <div class="row g-4">
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 review-card border-0">
             <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="stars mb-3">★★★★★</div>
+              <p class="mb-4" style="color:#374151;line-height:1.7">"The platform made our safety documents easier to manage, review, and update. Our team adopted it in under a week."</p>
+              <div class="d-flex align-items-center gap-3">
                 <div class="review-avatar"><i class="bi bi-person-fill"></i></div>
                 <div>
-                  <h5 class="fw-bold mb-1">Fleet Manager</h5>
-                  <small class="text-muted">Verified Client</small>
+                  <h6 class="fw-bold mb-0">Fleet Manager</h6>
+                  <small class="text-muted">Queensland Transport Co.</small>
                 </div>
               </div>
-              <p class="text-muted mb-0">“The platform made our safety documents easier to manage, review, and update.”</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 review-card border-0">
             <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="stars mb-3">★★★★★</div>
+              <p class="mb-4" style="color:#374151;line-height:1.7">"Clean, professional, and practical for day-to-day compliance management. Saved us hours every month on paperwork."</p>
+              <div class="d-flex align-items-center gap-3">
                 <div class="review-avatar"><i class="bi bi-person-fill"></i></div>
                 <div>
-                  <h5 class="fw-bold mb-1">Operations Lead</h5>
-                  <small class="text-muted">Verified Client</small>
+                  <h6 class="fw-bold mb-0">Operations Lead</h6>
+                  <small class="text-muted">NSW Heavy Haulage</small>
                 </div>
               </div>
-              <p class="text-muted mb-0">“Clean, professional, and practical for day-to-day compliance management.”</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
-          <div class="card custom-card h-100">
+          <div class="card custom-card h-100 review-card border-0">
             <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="stars mb-3">★★★★★</div>
+              <p class="mb-4" style="color:#374151;line-height:1.7">"A reliable system that saves time and improves operational control. The audit readiness tools alone are worth it."</p>
+              <div class="d-flex align-items-center gap-3">
                 <div class="review-avatar"><i class="bi bi-person-fill"></i></div>
                 <div>
-                  <h5 class="fw-bold mb-1">Business Owner</h5>
-                  <small class="text-muted">Verified Client</small>
+                  <h6 class="fw-bold mb-0">Business Owner</h6>
+                  <small class="text-muted">Victoria Logistics Group</small>
                 </div>
               </div>
-              <p class="text-muted mb-0">“A reliable system that saves time and improves operational control.”</p>
             </div>
           </div>
         </div>
@@ -403,66 +1331,273 @@ allowfullscreen>
     </div>
   </section>
 
+  <!-- ========== FOOTER ========== -->
   <footer class="footer-main pt-5" id="contact">
     <div class="container py-5">
-      <div class="row g-5 align-items-start">
-        <div class="col-lg-6">
-          <h3 class="fw-bold mb-3">Contact Us</h3>
-          <p class="mb-4">Let’s build a safer and smarter compliance system for your business.</p>
-          <div class="mb-4">
-            <p class="mb-2"><i class="bi bi-envelope-fill me-2"></i>info@prodrivecompliance.com</p>
-            <p class="mb-2"><i class="bi bi-telephone-fill me-2"></i>+61 4XX XXX XXX</p>
-            <p class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>Sydney, Australia</p>
+      <div class="row g-4 g-lg-5 align-items-start">
+        <div class="col-12 col-lg-5">
+          <div class="footer-brand mb-4">
+            <div class="footer-brand-title">PRODRIVE</div>
+            <div class="footer-brand-sub">SMS Builder</div>
           </div>
-          <div>
-            <p class="mb-3 fw-semibold">Compliance &amp; Industry Alignment</p>
+          <p class="mb-4 footer-tagline">Let's build a safer and smarter compliance system for your business.</p>
+          <div class="footer-contact-items mb-4">
+            <a href="mailto:info@prodrivecompliance.com" class="footer-contact-item">
+              <div class="footer-contact-icon"><i class="bi bi-envelope-fill"></i></div>
+              <span>info@prodrivecompliance.com</span>
+            </a>
+            <a href="tel:+614XXXXXXXX" class="footer-contact-item">
+              <div class="footer-contact-icon"><i class="bi bi-telephone-fill"></i></div>
+              <span>+61 4XX XXX XXX</span>
+            </a>
+            <div class="footer-contact-item">
+              <div class="footer-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+              <span>Sydney, Australia</span>
+            </div>
+          </div>
+          <div class="mb-4">
+            <p class="mb-3 fw-semibold text-white">Compliance &amp; Industry Alignment</p>
             <div class="d-flex flex-wrap gap-3">
               <img src="logos/nhvr.png" alt="NHVR" class="logo-badge" />
               <img src="logos/hvnl.png" alt="HVNL" class="logo-badge" />
               <img src="logos/mastercode.png" alt="Master Code" class="logo-badge" />
             </div>
           </div>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-btn" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="Twitter/X"><i class="bi bi-twitter-x"></i></a>
+          </div>
         </div>
-        <div class="col-lg-6">
-          <div class="card custom-card">
-            <div class="card-body p-4 p-lg-5 text-dark">
-              <h4 class="fw-bold mb-4">Send a Message</h4>
-              <form>
-                <div class="mb-3">
-                  <input type="text" class="form-control form-control-lg" placeholder="Your Name" />
-                </div>
-                <div class="mb-3">
-                  <input type="email" class="form-control form-control-lg" placeholder="Email Address" />
-                </div>
-                <div class="mb-3">
-                  <textarea class="form-control form-control-lg" rows="5" placeholder="Write your message"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-lg w-100">Submit</button>
-              </form>
+
+        <div class="col-12 col-lg-7">
+          <div class="simple-form-card">
+            <h4 class="fw-bold mb-3">Send a Message</h4>
+
+            <div class="simple-success d-none" id="formSuccess">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              Message sent! We'll be in touch within 1 business day.
+            </div>
+
+            <div id="contactForm">
+              <div class="mb-2">
+                <input type="text" class="simple-input" id="contactName" placeholder="Your Name *" />
+                <div class="simple-error" id="nameError">Please enter your name.</div>
+              </div>
+              <div class="mb-2">
+                <input type="email" class="simple-input" id="contactEmail" placeholder="Email Address *" />
+                <div class="simple-error" id="emailError">Please enter a valid email.</div>
+              </div>
+              <div class="mb-2">
+                <textarea class="simple-input" id="contactMessage" rows="3" placeholder="Write your message *"></textarea>
+                <div class="simple-error" id="messageErrorMsg">Please write a message (min. 20 characters).</div>
+              </div>
+              <div class="mb-2 d-flex align-items-start gap-2">
+                <input type="checkbox" class="form-check-input mt-1" id="privacyCheck" style="flex-shrink:0" />
+                <label class="form-check-label small" for="privacyCheck" style="color:#94a3b8">
+                  I agree to the <a href="#" style="color:#60a5fa">Privacy Policy</a>.
+                </label>
+              </div>
+              <div class="simple-error mb-2" id="privacyError">You must agree to continue.</div>
+              <button type="button" class="simple-submit-btn" id="contactSubmitBtn" onclick="submitContactForm()">
+                <span id="btnText">Submit</span>
+                <span id="btnLoading" class="d-none"><span class="spinner-border spinner-border-sm me-2"></span>Sending…</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="border-top border-secondary py-4 text-center">
-      © 2026 PRODRIVE Compliance. All rights reserved.
+    <div class="footer-bottom py-4">
+      <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          <div>© 2026 PRODRIVE Compliance. All rights reserved.</div>
+          <div class="d-flex gap-3 footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookie Policy</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="membership-strip py-4">
       <div class="container text-center">
-        <p class="mb-3 text-white">Proud Member Of</p>
+        <p class="mb-3 text-white small fw-semibold" style="text-transform:uppercase;letter-spacing:1.5px">Proud Member Of</p>
         <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
-          <img src="logos/company1.png" alt="Membership Company 1" class="membership-logo" />
-          <img src="logos/company2.png" alt="Membership Company 2" class="membership-logo" />
-          <img src="logos/company3.png" alt="Membership Company 3" class="membership-logo" />
+          <img src="logos/company1.png" alt="Membership 1" class="membership-logo" />
+          <img src="logos/company2.png" alt="Membership 2" class="membership-logo" />
+          <img src="logos/company3.png" alt="Membership 3" class="membership-logo" />
         </div>
       </div>
     </div>
   </footer>
 
-  <button class="btn btn-primary chat-btn">Chat</button>
+  <!-- ========== AI CHATBOT ========== -->
+  <div class="chat-launcher" id="chatLauncher">
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-header-avatar"><i class="bi bi-robot"></i></div>
+        <div class="chat-header-info">
+          <strong>PRODRIVE Assistant</strong>
+          <small><span class="chat-header-status"></span>Online — replies instantly</small>
+        </div>
+        <button class="chat-close" onclick="toggleChat()" aria-label="Close chat"><i class="bi bi-x-lg"></i></button>
+      </div>
 
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg msg-bot">
+          <div class="msg-bubble">👋 Hi! I'm the PRODRIVE compliance assistant. I can help with questions about our platform, pricing, HVNL compliance, and more.<br><br>What can I help you with today?</div>
+          <div class="msg-time">Just now</div>
+        </div>
+      </div>
+
+      <div class="chat-quick-replies" id="quickReplies">
+        <button class="quick-reply-btn" onclick="sendQuickReply('What is PRODRIVE?')">What is PRODRIVE?</button>
+        <button class="quick-reply-btn" onclick="sendQuickReply('Tell me about pricing')">Pricing</button>
+        <button class="quick-reply-btn" onclick="sendQuickReply('What is HVNL compliance?')">HVNL compliance</button>
+        <button class="quick-reply-btn" onclick="sendQuickReply('How do I get started?')">Get started</button>
+      </div>
+
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()" />
+        <button class="chat-send-btn" onclick="sendChat()" aria-label="Send"><i class="bi bi-send-fill"></i></button>
+      </div>
+    </div>
+
+    <button class="chat-bubble-btn" onclick="toggleChat()" aria-label="Open chat">
+      <i class="bi bi-chat-dots-fill" id="chatIcon"></i>
+      <span class="chat-ping"></span>
+    </button>
+  </div>
+
+  <!-- ========== SCRIPTS ========== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ---- CHATBOT ----
+    let chatOpen = false;
+
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      const win = document.getElementById('chatWindow');
+      const icon = document.getElementById('chatIcon');
+      win.classList.toggle('open', chatOpen);
+      icon.className = chatOpen ? 'bi bi-x-lg' : 'bi bi-chat-dots-fill';
+    }
+
+    function sendQuickReply(text) {
+      document.getElementById('quickReplies').style.display = 'none';
+      addMessage(text, 'user');
+      fetchAIResponse(text);
+    }
+
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      document.getElementById('quickReplies').style.display = 'none';
+      addMessage(text, 'user');
+      fetchAIResponse(text);
+    }
+
+    function addMessage(text, role) {
+      const msgs = document.getElementById('chatMessages');
+      const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const div = document.createElement('div');
+      div.className = `msg msg-${role}`;
+      div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-time">${now}</div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+      return div;
+    }
+
+    function showTyping() {
+      const msgs = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = 'msg msg-bot';
+      div.id = 'typingIndicator';
+      div.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function removeTyping() {
+      const el = document.getElementById('typingIndicator');
+      if (el) el.remove();
+    }
+
+    async function fetchAIResponse(userMessage) {
+      showTyping();
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: `You are a friendly and knowledgeable assistant for PRODRIVE Compliance, an Australian web-based Safety Management System (SMS) Builder for heavy vehicle transport businesses. 
+
+Your role: Answer questions about PRODRIVE's platform, features, pricing, and Heavy Vehicle National Law (HVNL) compliance. Be helpful, concise, and professional.
+
+Key facts about PRODRIVE:
+- Platform: Web-based SMS Builder for heavy vehicle operators in Australia
+- Location: Sydney, Australia
+- Contact: info@prodrivecompliance.com, +61 4XX XXX XXX
+- Pricing: Starter $29/mo, Professional $59/mo, Enterprise $99/mo
+- Features: SMS Document Builder, Compliance Tracking, Driver & Fleet Records, Incident Reporting, Analytics Dashboard, Secure User Access
+- Compliance: Aligned with HVNL (Heavy Vehicle National Law), NHVR, Chain of Responsibility, Risk Assessments, Audit Readiness
+
+Keep responses brief (2-4 sentences max). Use simple language. End with a helpful next step when appropriate. Do not make up specific details not listed above.`,
+            messages: [{ role: 'user', content: userMessage }]
+          })
+        });
+        const data = await response.json();
+        removeTyping();
+        const reply = data.content && data.content[0] ? data.content[0].text : "Thanks for your message! For detailed assistance, please email us at info@prodrivecompliance.com.";
+        addMessage(reply, 'bot');
+      } catch (err) {
+        removeTyping();
+        addMessage("Sorry, I'm having trouble connecting right now. Please email us at info@prodrivecompliance.com or call +61 4XX XXX XXX.", 'bot');
+      }
+    }
+
+    // ---- CONTACT FORM VALIDATION ----
+    function submitContactForm() {
+      let valid = true;
+
+      function check(inputId, errorId, testFn) {
+        const el = document.getElementById(inputId);
+        const err = document.getElementById(errorId);
+        const bad = !testFn(el.value.trim());
+        el.classList.toggle('err', bad);
+        err.classList.toggle('show', bad);
+        if (bad) valid = false;
+      }
+
+      check('contactName',    'nameError',       v => v.length >= 2);
+      check('contactEmail',   'emailError',      v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+      check('contactMessage', 'messageErrorMsg', v => v.length >= 20);
+
+      const privacy = document.getElementById('privacyCheck').checked;
+      document.getElementById('privacyError').classList.toggle('show', !privacy);
+      if (!privacy) valid = false;
+
+      if (!valid) return;
+
+      const btn = document.getElementById('contactSubmitBtn');
+      document.getElementById('btnText').classList.add('d-none');
+      document.getElementById('btnLoading').classList.remove('d-none');
+      btn.disabled = true;
+
+      setTimeout(() => {
+        document.getElementById('contactForm').classList.add('d-none');
+        document.getElementById('formSuccess').classList.remove('d-none');
+      }, 1400);
+    }
+  </script>
 </body>
 </html>
