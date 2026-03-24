@@ -933,6 +933,12 @@
       .pricing-price { font-size: 30px; }
       .container { padding-left: 16px; padding-right: 16px; }
     }
+
+    @media (max-width: 991px) {
+  .nav-item {
+    margin-top: 10px;
+  }
+}
   </style>
 </head>
 <body>
@@ -981,6 +987,17 @@
             <a href="signin.html" class="btn btn-primary btn-sm px-3">Sign In</a>
             <a href="signup.html" class="btn btn-outline-primary btn-sm px-3">Sign Up</a>
           </li>
+<li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+  <a href="profile.html" class="d-flex align-items-center gap-2 text-decoration-none">
+    
+    <img src="images/user.png" alt="Profile"
+         style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+
+
+    
+  </a>
+</li>
+
 
           <!-- Profile Dropdown (logged in — remove d-none to activate) -->
           <li class="nav-item dropdown mt-2 mt-lg-0 ms-lg-2 d-none" id="profileMenu">

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Profile – PRODRIVE Compliance</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --soft: #eef4ff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --dark: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --light-bg: #f8fafc;
+  --accent: #06b6d4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--light-bg); color: #1e293b; }
+
+/* TOPBAR */
+.topbar { background: var(--dark); color: rgba(255,255,255,0.8); font-size: 13px; padding: 8px 0; }
+.topbar a { color: rgba(255,255,255,0.7); text-decoration: none; }
+.topbar a:hover { color: white; }
+
+/* NAVBAR */
+.navbar { background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 200; }
+.brand-title { font-size: 26px; font-weight: 800; color: var(--primary); line-height: 1; }
+.brand-subtitle { font-size: 11px; color: #94a3b8; }
+.nav-link { font-weight: 500; color: #374151 !important; font-size: 14px; border-radius: 8px; transition: all .2s; }
+.nav-link:hover { color: var(--primary) !important; background: var(--soft); }
+.nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; }
+
+/* PROFILE HEADER */
+.profile-header {
+  background: linear-gradient(140deg, #06142e 0%, #0f3d91 60%, #0c2461 100%);
+  color: white; padding: 32px 0 0; position: relative; overflow: hidden;
+}
+.profile-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.profile-avatar-wrap { position: relative; display: inline-block; }
+.profile-avatar {
+  width: 80px; height: 80px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: white; font-weight: 800;
+  border: 3px solid rgba(255,255,255,0.25);
+}
+.avatar-dot { position: absolute; bottom: -3px; right: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--success); border: 3px solid white; }
+.profile-meta h2 { font-size: 22px; font-weight: 800; margin-bottom: 3px; }
+.profile-meta .sub { color: #cbd5e1; font-size: 13px; }
+.plan-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.3); color: #93c5fd; font-size: 11px; font-weight: 700; padding: 3px 11px; border-radius: 40px; margin-top: 7px; }
+.active-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; font-size: 11px; font-weight: 700; padding: 3px 11px; border-radius: 40px; margin-top: 7px; margin-left: 6px; }
+.active-badge span { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; display: inline-block; }
+
+/* TABS */
+.profile-tabs { display: flex; gap: 2px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); overflow-x: auto; scrollbar-width: none; }
+.profile-tabs::-webkit-scrollbar { display: none; }
+.tab-btn { background: none; border: none; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 600; padding: 13px 18px; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; font-family: inherit; display: flex; align-items: center; gap: 7px; }
+.tab-btn:hover { color: rgba(255,255,255,0.85); }
+.tab-btn.active { color: white; border-bottom-color: #60a5fa; }
+
+/* BODY */
+.page-body { padding: 28px 0 56px; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* CARDS */
+.card-box { background: white; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+.card-box:hover { box-shadow: 0 6px 24px rgba(37,99,235,0.07); }
+.card-top { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-top-title { font-size: 14px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+.card-top-title i { color: var(--primary); }
+.card-pad { padding: 4px 20px 8px; }
+
+/* INFO ROWS */
+.info-row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f8fafc; }
+.info-row:last-child { border-bottom: none; }
+.info-key { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; min-width: 130px; flex-shrink: 0; padding-top: 1px; }
+.info-val { font-size: 13px; font-weight: 500; color: #1e293b; flex: 1; }
+
+/* STAT CARDS */
+.stat-card { background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid var(--border); height: 100%; }
+.stat-card:hover { border-color: #bfdbfe; box-shadow: 0 4px 16px rgba(37,99,235,0.07); }
+.stat-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+.stat-num { font-size: 26px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 3px; }
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+/* COMPLIANCE RING */
+.score-wrap { display: flex; align-items: center; gap: 20px; padding: 8px 0 4px; }
+.score-ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+.score-ring svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: #e2e8f0; stroke-width: 7; }
+.ring-fill { fill: none; stroke: var(--success); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .9s ease; }
+.ring-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: var(--success); }
+.score-info h5 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.score-info p { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* PROGRESS */
+.prog { margin-bottom: 12px; }
+.prog:last-child { margin-bottom: 0; }
+.prog-lbl { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; font-weight: 500; color: #374151; }
+.prog-lbl span:last-child { color: var(--muted); font-weight: 600; }
+.prog-track { height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; transition: width 1s ease .3s; }
+
+/* STATUS BADGES */
+.sbadge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 40px; font-size: 12px; font-weight: 700; }
+.s-green { background: #dcfce7; color: #166534; }
+.s-amber { background: #fef3c7; color: #92400e; }
+.sdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+/* ACTIVITY */
+.act-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+.act-item:last-child { border-bottom: none; }
+.act-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.act-text { font-size: 13px; color: #374151; line-height: 1.5; }
+.act-text strong { color: #1e293b; }
+.act-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* DOCS */
+.doc-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f8fafc; }
+.doc-item:last-child { border-bottom: none; }
+.doc-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.doc-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.doc-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* BUTTONS */
+.btn-edit { background: var(--soft); color: var(--primary); border: 1.5px solid #bfdbfe; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 5px 13px; cursor: pointer; font-family: inherit; transition: all .15s; display: inline-flex; align-items: center; gap: 5px; }
+.btn-edit:hover { background: #dbeafe; }
+.btn-sm-primary { background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 6px 14px; cursor: pointer; font-family: inherit; transition: background .15s; display: inline-flex; align-items: center; gap: 5px; }
+.btn-sm-primary:hover { background: var(--primary-dark); }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1050; align-items: center; justify-content: center; padding: 20px; }
+.modal-box { background: white; border-radius: 18px; max-width: 440px; width: 100%; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.18); }
+.modal-input { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: #f8fafc; outline: none; transition: border-color .2s; }
+.modal-input:focus { border-color: var(--primary); background: white; }
+.modal-label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 5px; }
+
+@media (max-width: 767px) {
+  .profile-avatar { width: 64px; height: 64px; font-size: 24px; }
+  .profile-meta h2 { font-size: 18px; }
+  .info-key { min-width: 100px; font-size: 11px; }
+  .stat-num { font-size: 22px; }
+  .d-md-flex { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar py-2">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <span><i class="bi bi-telephone-fill me-1"></i>+61 4XX XXX XXX</span>
+      <span class="d-none d-md-inline" style="color:#475569">|</span>
+      <span class="d-none d-md-inline"><i class="bi bi-envelope-fill me-1"></i>info@prodrivecompliance.com</span>
+    </div>
+    <div class="d-none d-sm-flex gap-3">
+      <a href="#"><i class="bi bi-facebook"></i></a>
+      <a href="#"><i class="bi bi-linkedin"></i></a>
+      <a href="#"><i class="bi bi-instagram"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container py-2">
+    <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+      <div><div class="brand-title">PRODRIVE</div><small class="brand-subtitle">SMS Builder</small></div>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link px-3" href="index.html#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="index.html#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="index.html#pricing">Pricing</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="index.html#contact">Contact</a></li>
+        <li class="nav-item dropdown ms-lg-2">
+          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0 px-2" href="#" role="button" data-bs-toggle="dropdown">
+            <div class="nav-avatar">AF</div>
+            <span class="fw-semibold small d-none d-lg-inline">Apex Freight</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" style="border-radius:14px;min-width:210px">
+            <li><div class="px-3 py-2 border-bottom"><div class="fw-bold small">Apex Freight Pty Ltd</div><div class="text-muted" style="font-size:12px">admin@apexfreight.com.au</div></div></li>
+
+            <li><a class="dropdown-item py-2" href="form.html"><i class="bi bi-file-earmark-text me-2 text-primary"></i>SMS Builder</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2 text-danger" href="signin.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PROFILE HEADER -->
+<div class="profile-header">
+  <div class="container position-relative">
+    <div class="d-flex align-items-start gap-3 mb-4">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">AF</div>
+        <div class="avatar-dot"></div>
+      </div>
+      <div class="profile-meta">
+        <h2>Apex Freight Pty Ltd</h2>
+        <div class="sub"><i class="bi bi-geo-alt me-1"></i>Sydney, NSW &nbsp;·&nbsp; ABN 51 234 567 890</div>
+        <div>
+          <span class="plan-badge"><i class="bi bi-star-fill"></i>Professional Plan</span>
+          <span class="active-badge"><span></span>Active</span>
+        </div>
+      </div>
+      <div class="ms-auto d-none d-md-flex gap-2 pt-1">
+        <button class="btn-edit" onclick="openModal()"><i class="bi bi-pencil"></i>Edit</button>
+        <button class="btn-sm-primary" onclick="location.href='form.html'"><i class="bi bi-plus"></i>New SMS</button>
+      </div>
+    </div>
+
+    <nav class="profile-tabs">
+      <button class="tab-btn active" onclick="goTab('overview',this)"><i class="bi bi-grid-1x2"></i>Overview</button>
+      <button class="tab-btn" onclick="goTab('company',this)"><i class="bi bi-building"></i>Company</button>
+      <button class="tab-btn" onclick="goTab('documents',this)"><i class="bi bi-folder2"></i>Documents</button>
+      <button class="tab-btn" onclick="goTab('activity',this)"><i class="bi bi-clock-history"></i>Activity</button>
+    </nav>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+  <div class="container">
+
+    <!-- OVERVIEW -->
+    <div id="tab-overview" class="tab-pane active">
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#eff6ff;color:var(--primary)"><i class="bi bi-truck"></i></div>
+            <div class="stat-num">24</div><div class="stat-label">Fleet Vehicles</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-people"></i></div>
+            <div class="stat-num">18</div><div class="stat-label">Active Drivers</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fefce8;color:#b45309"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="stat-num">3</div><div class="stat-label">Open Incidents</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-file-earmark-check"></i></div>
+            <div class="stat-num">12</div><div class="stat-label">Documents</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-5">
+          <div class="card-box">
+            <div class="card-top"><div class="card-top-title"><i class="bi bi-shield-check"></i>Compliance Score</div></div>
+            <div class="card-pad" style="padding-top:16px">
+              <div class="score-wrap mb-4">
+                <div class="score-ring">
+                  <svg viewBox="0 0 80 80" width="80" height="80">
+                    <circle class="ring-bg" cx="40" cy="40" r="33"/>
+                    <circle class="ring-fill" id="scoreRing" cx="40" cy="40" r="33" stroke-dasharray="207" stroke-dashoffset="207"/>
+                  </svg>
+                  <div class="ring-num" id="scoreNum">0%</div>
+                </div>
+                <div class="score-info">
+                  <h5>Good Standing</h5>
+                  <p>2 areas need attention to reach full compliance.</p>
+                </div>
+              </div>
+              <div class="prog"><div class="prog-lbl"><span>Fatigue Management</span><span>100%</span></div><div class="prog-track"><div class="prog-fill" data-w="100" style="background:var(--success);width:0"></div></div></div>
+              <div class="prog"><div class="prog-lbl"><span>Vehicle Maintenance</span><span>85%</span></div><div class="prog-track"><div class="prog-fill" data-w="85" style="background:var(--primary);width:0"></div></div></div>
+              <div class="prog"><div class="prog-lbl"><span>Driver Records</span><span>78%</span></div><div class="prog-track"><div class="prog-fill" data-w="78" style="background:#06b6d4;width:0"></div></div></div>
+              <div class="prog"><div class="prog-lbl"><span>Incident Reporting</span><span>60%</span></div><div class="prog-track"><div class="prog-fill" data-w="60" style="background:var(--warning);width:0"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-7">
+          <div class="card-box mb-4">
+            <div class="card-top">
+              <div class="card-top-title"><i class="bi bi-person-badge"></i>Contact Person</div>
+              <button class="btn-edit" onclick="openModal()"><i class="bi bi-pencil"></i>Edit</button>
+            </div>
+            <div class="card-pad">
+              <div class="info-row"><div class="info-key">Name</div><div class="info-val">James Crawford</div></div>
+              <div class="info-row"><div class="info-key">Role</div><div class="info-val">Fleet Manager</div></div>
+              <div class="info-row"><div class="info-key">Email</div><div class="info-val"><a href="mailto:james@apexfreight.com.au" style="color:var(--primary);text-decoration:none">james@apexfreight.com.au</a></div></div>
+              <div class="info-row"><div class="info-key">Phone</div><div class="info-val">+61 412 345 678</div></div>
+              <div class="info-row"><div class="info-key">Member Since</div><div class="info-val">January 2024</div></div>
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-top"><div class="card-top-title"><i class="bi bi-clock-history"></i>Recent Activity</div></div>
+            <div class="card-pad">
+              <div class="act-item">
+                <div class="act-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-check-circle"></i></div>
+                <div><div class="act-text"><strong>SMS Profile updated</strong> — Fleet information revised</div><div class="act-time">2 hours ago</div></div>
+              </div>
+              <div class="act-item">
+                <div class="act-icon" style="background:#fefce8;color:#b45309"><i class="bi bi-exclamation-triangle"></i></div>
+                <div><div class="act-text"><strong>Incident logged</strong> — Near-miss at Eastern Depot</div><div class="act-time">Yesterday, 3:42 PM</div></div>
+              </div>
+              <div class="act-item">
+                <div class="act-icon" style="background:#eff6ff;color:var(--primary)"><i class="bi bi-file-earmark-text"></i></div>
+                <div><div class="act-text"><strong>Document uploaded</strong> — Fatigue Management Policy v3</div><div class="act-time">Mar 20, 2026</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPANY -->
+    <div id="tab-company" class="tab-pane">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card-box">
+            <div class="card-top">
+              <div class="card-top-title"><i class="bi bi-building"></i>Business Details</div>
+              <button class="btn-edit" onclick="openModal()"><i class="bi bi-pencil"></i>Edit</button>
+            </div>
+            <div class="card-pad">
+              <div class="info-row"><div class="info-key">Company Name</div><div class="info-val">Apex Freight Pty Ltd</div></div>
+              <div class="info-row"><div class="info-key">ABN</div><div class="info-val">51 234 567 890</div></div>
+              <div class="info-row"><div class="info-key">Address</div><div class="info-val">45 Industrial Drive, Wetherill Park NSW 2164</div></div>
+              <div class="info-row"><div class="info-key">Phone</div><div class="info-val">+61 2 9612 3456</div></div>
+              <div class="info-row"><div class="info-key">Email</div><div class="info-val"><a href="mailto:admin@apexfreight.com.au" style="color:var(--primary);text-decoration:none">admin@apexfreight.com.au</a></div></div>
+              <div class="info-row"><div class="info-key">Contact Person</div><div class="info-val">James Crawford</div></div>
+              <div class="info-row"><div class="info-key">Role</div><div class="info-val">Fleet Manager</div></div>
+              <div class="info-row"><div class="info-key">Plan</div><div class="info-val"><span class="sbadge s-green"><span class="sdot"></span>Professional</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card-box">
+            <div class="card-top"><div class="card-top-title"><i class="bi bi-award"></i>Accreditations</div></div>
+            <div class="card-pad">
+              <div class="info-row"><div class="info-key">Mass Management</div><div class="info-val"><span class="sbadge s-green"><span class="sdot"></span>Current</span></div></div>
+              <div class="info-row"><div class="info-key">Fatigue Mgmt</div><div class="info-val"><span class="sbadge s-green"><span class="sdot"></span>Current</span></div></div>
+              <div class="info-row"><div class="info-key">TruckSafe</div><div class="info-val"><span class="sbadge s-green"><span class="sdot"></span>Current</span> <span style="font-size:11px;color:var(--muted);margin-left:6px">Mar 15, 2026</span></div></div>
+              <div class="info-row"><div class="info-key">WAHVA</div><div class="info-val"><span class="sbadge s-amber"><span class="sdot"></span>Due for Renewal</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div id="tab-documents" class="tab-pane">
+      <div class="card-box">
+        <div class="card-top">
+          <div class="card-top-title"><i class="bi bi-folder2-open"></i>Document Library</div>
+          <button class="btn-sm-primary"><i class="bi bi-cloud-upload"></i>Upload</button>
+        </div>
+        <div class="card-pad">
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">Fatigue Management Policy v3.pdf</div><div class="doc-meta">Mar 20, 2026 · 1.2 MB</div></div>
+            <span class="sbadge s-green"><span class="sdot"></span>Current</span>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">Drug &amp; Alcohol Policy 2026.pdf</div><div class="doc-meta">Jan 12, 2026 · 890 KB</div></div>
+            <span class="sbadge s-green"><span class="sdot"></span>Current</span>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-word"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">Chain of Responsibility Procedures.docx</div><div class="doc-meta">Dec 5, 2025 · 340 KB</div></div>
+            <span class="sbadge s-green"><span class="sdot"></span>Current</span>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">Emergency Response Plan.pdf</div><div class="doc-meta">Jun 3, 2025 · 2.1 MB</div></div>
+            <span class="sbadge s-amber"><span class="sdot"></span>Needs Review</span>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">Risk Register 2026.xlsx</div><div class="doc-meta">Feb 18, 2026 · 145 KB</div></div>
+            <span class="sbadge s-green"><span class="sdot"></span>Current</span>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div style="flex:1;min-width:0"><div class="doc-name">TruckSafe Audit Certificate 2026.pdf</div><div class="doc-meta">Mar 15, 2026 · 560 KB</div></div>
+            <span class="sbadge s-green"><span class="sdot"></span>Current</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div id="tab-activity" class="tab-pane">
+      <div class="card-box">
+        <div class="card-top"><div class="card-top-title"><i class="bi bi-clock-history"></i>Activity Log</div></div>
+        <div class="card-pad">
+          <div class="act-item">
+            <div class="act-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-check-circle"></i></div>
+            <div><div class="act-text"><strong>SMS Profile updated</strong> — Fleet information revised, 2 vehicles added</div><div class="act-time">Today, 9:14 AM · James Crawford</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#fefce8;color:#b45309"><i class="bi bi-exclamation-triangle"></i></div>
+            <div><div class="act-text"><strong>Incident logged</strong> — Near-miss reported at Eastern Depot</div><div class="act-time">Yesterday, 3:42 PM · Mark Stevens</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#eff6ff;color:var(--primary)"><i class="bi bi-file-earmark-text"></i></div>
+            <div><div class="act-text"><strong>Document uploaded</strong> — Fatigue Management Policy v3</div><div class="act-time">Mar 20, 2026 · James Crawford</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-shield-check"></i></div>
+            <div><div class="act-text"><strong>Accreditation renewed</strong> — TruckSafe audit completed</div><div class="act-time">Mar 15, 2026 · James Crawford</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#fdf2f8;color:#9333ea"><i class="bi bi-person-plus"></i></div>
+            <div><div class="act-text"><strong>Subcontractor added</strong> — Blue Star Transport Pty Ltd</div><div class="act-time">Mar 10, 2026 · James Crawford</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#eff6ff;color:var(--primary)"><i class="bi bi-file-earmark-text"></i></div>
+            <div><div class="act-text"><strong>SMS form submitted</strong> — Full Safety Management System profile submitted</div><div class="act-time">Feb 28, 2026 · James Crawford</div></div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon" style="background:#f0fdf4;color:var(--success)"><i class="bi bi-person-check"></i></div>
+            <div><div class="act-text"><strong>Account created</strong> — Company account registered and verified</div><div class="act-time">Jan 8, 2024</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0">Edit Profile</h5>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1">&times;</button>
+    </div>
+    <div class="mb-3"><label class="modal-label">Company Name</label><input class="modal-input" value="Apex Freight Pty Ltd"></div>
+    <div class="mb-3"><label class="modal-label">Contact Person</label><input class="modal-input" value="James Crawford"></div>
+    <div class="mb-3"><label class="modal-label">Email</label><input class="modal-input" type="email" value="james@apexfreight.com.au"></div>
+    <div class="mb-4"><label class="modal-label">Phone</label><input class="modal-input" value="+61 412 345 678"></div>
+    <div class="d-flex gap-3">
+      <button onclick="closeModal()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:#f8fafc;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit">Cancel</button>
+      <button onclick="closeModal()" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--primary);color:white;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function goTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+function openModal() { document.getElementById('editModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+window.addEventListener('load', () => {
+  document.querySelectorAll('.prog-fill[data-w]').forEach(el => {
+    setTimeout(() => el.style.width = el.dataset.w + '%', 300);
+  });
+  const target = 82, circ = 207;
+  const ring = document.getElementById('scoreRing');
+  const num = document.getElementById('scoreNum');
+  let cur = 0;
+  const tick = () => {
+    cur = Math.min(cur + 2, target);
+    ring.style.strokeDashoffset = circ - (cur / 100) * circ;
+    num.textContent = cur + '%';
+    if (cur < target) requestAnimationFrame(tick);
+  };
+  setTimeout(tick, 400);
+});
+</script>
+</body>
+</html>
