@@ -551,7 +551,7 @@ body {
     <h1>SMS Builder Form</h1>
     <p>Complete your Safety Management System profile — 7 steps, takes about 10 minutes.</p>
   </div>
-</div>
+</div> 
 
 <!-- ── MOBILE PROGRESS ── -->
 <div class="mobile-progress"><div class="mobile-prog-fill" id="mobileProg"></div></div>
@@ -1246,12 +1246,13 @@ function buildReview(){
 // ── SUBMIT ──
 function toggleSubmit(){ document.getElementById('submitBtn').disabled=!document.getElementById('declareCheck').checked; }
 function submitForm(){
+   window.location.href = "sms-manual.html";
   document.getElementById('formShell').style.display='none';
   document.getElementById('successScreen').style.display='block';
-  document.getElementById('successCompany').textContent=val('company');
+  //document.getElementById('successCompany').textContent=val('company');
   document.getElementById('refId').textContent='PD-'+Date.now().toString(36).toUpperCase();
   window.scrollTo({top:0,behavior:'smooth'});
-    window.location.href = "sms-manual.html";
+   
 }
 </script>
 </body>
