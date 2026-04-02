@@ -1,72 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background: #35424a;
-            color: #ffffff;
-            padding: 10px 0;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .card {
-            background: #e2e2e2;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        @media screen and (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                padding: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProDrive Admin Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    (function(){var t=localStorage.getItem('prodrive_theme');if(t==='dark')document.documentElement.classList.add('pre-dark');})();
+  </script>
+  <style>
+    :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-glow:rgba(37,99,235,.18);--dark:#0f172a;--dark2:#1e293b;--light-bg:#f8fafc;--soft:#eef4ff;--muted:#64748b;--card-radius:20px;--accent:#06b6d4;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;}
+    html.pre-dark body{background:var(--dark2)!important;}
+    *,*::before,*::after{box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin:0;padding:0;background:var(--light-bg);color:#1e293b;transition:background .3s,color .3s;}
+    .sidebar{width:260px;height:100vh;position:fixed;left:0;top:0;background:var(--dark);display:flex;flex-direction:column;z-index:1000;transition:transform .3s ease;overflow-y:auto;}
+    .sidebar-collapsed .sidebar{transform:translateX(-260px);}
+    .sidebar-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.08);}
+    .sidebar-brand .brand-icon{width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:white;margin-bottom:8px;}
+    .sidebar-brand .brand-name{font-weight:700;font-size:18px;color:#f1f5f9;line-height:1.1;}
+    .sidebar-brand .brand-sub{font-size:11px;color:#64748b;letter-spacing:.5px;text-transform:uppercase;}
+    .nav-section-header{font-size:10px;font-weight:600;letter-spacing:1.2px;color:#475569;padding:16px 24px 4px;text-transform:uppercase;}
+    .nav-item-link{display:flex;align-items:center;gap:12px;padding:10px 16px;color:#94a3b8;text-decoration:none;border-radius:8px;margin:2px 8px;transition:all .2s;cursor:pointer;font-size:14px;}
+    .nav-item-link i{font-size:16px;width:20px;text-align:center;}
+    .nav-item-link:hover{background:rgba(255,255,255,.08);color:#e2e8f0;}
+    .nav-item-link.active{background:var(--primary);color:white;}
+    .sidebar-footer{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;}
+    .sidebar-footer button{flex:1;padding:8px;background:rgba(255,255,255,.06);border:none;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s;}
+    .sidebar-footer button:hover{background:rgba(255,255,255,.12);color:#e2e8f0;}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;}
+    .main-content{margin-left:260px;min-height:100vh;background:var(--light-bg);transition:margin-left .3s ease;display:flex;flex-direction:column;}
+    .sidebar-collapsed .main-content{margin-left:0;}
+    .topbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;align-items:center;gap:12px;}
+    .topbar .hamburger{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;}
+    .topbar .hamburger:hover{background:var(--soft);}
+    .topbar .breadcrumb-area{flex:1;font-size:13px;color:var(--muted);}
+    .topbar .topbar-clock{font-size:13px;color:var(--muted);white-space:nowrap;}
+    .topbar .search-wrap{position:relative;}
+    .topbar .search-wrap input{padding:7px 12px 7px 34px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:var(--light-bg);width:180px;}
+    .topbar .search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);}
+    .topbar .notif-btn{position:relative;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;}
+    .topbar .notif-btn:hover{background:var(--soft);}
+    .notif-badge{position:absolute;top:0;right:2px;background:var(--danger);color:white;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);color:white;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+    .content-area{padding:24px;flex:1;}
+    .view-section{display:none;animation:fadeIn .3s ease;}
+    .view-section.active{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+    .stat-card{border-radius:var(--card-radius);border:none;transition:transform .2s,box-shadow .2s;}
+    .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12);}
+    .stat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+    .table-container{background:white;border-radius:var(--card-radius);padding:0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .table-container .table{margin:0;}
+    .table thead th{background:var(--light-bg);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid #e2e8f0;padding:12px 16px;}
+    .table tbody td{padding:12px 16px;vertical-align:middle;font-size:14px;border-color:#f1f5f9;}
+    .table tbody tr:hover{background:#f8faff;}
+    .doc-card{background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;}
+    .doc-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1);}
+    .doc-icon{font-size:42px;margin-bottom:12px;display:block;}
+    body.dark-mode{background:var(--dark2);color:#e2e8f0;}
+    body.dark-mode .main-content{background:var(--dark2);}
+    body.dark-mode .topbar{background:var(--dark);border-color:#334155;}
+    body.dark-mode .topbar .search-wrap input{background:#1e293b;border-color:#334155;color:#e2e8f0;}
+    body.dark-mode .card,body.dark-mode .table-container,body.dark-mode .doc-card{background:var(--dark);border-color:#334155;}
+    body.dark-mode .stat-card{background:var(--dark);}
+    body.dark-mode .table{color:#e2e8f0;}
+    body.dark-mode .table thead th{background:#1e293b;color:#94a3b8;border-color:#334155;}
+    body.dark-mode .table tbody td{border-color:#1e293b;}
+    body.dark-mode .table tbody tr:hover{background:#1e293b;}
+    body.dark-mode .form-control,body.dark-mode .form-select{background:#1e293b;border-color:#334155;color:#e2e8f0;}
+    body.dark-mode .modal-content{background:var(--dark);color:#e2e8f0;border-color:#334155;}
+    body.dark-mode .modal-header,body.dark-mode .modal-footer{border-color:#334155;}
+    body.dark-mode .nav-tabs .nav-link{color:#94a3b8;border-color:#334155;}
+    body.dark-mode .nav-tabs{border-color:#334155;}
+    body.dark-mode .nav-tabs .nav-link.active{background:var(--dark);color:#e2e8f0;border-bottom-color:var(--dark);}
+    body.dark-mode .tab-content{background:var(--dark);}
+    body.dark-mode .page-link{background:var(--dark);border-color:#334155;color:#94a3b8;}
+    body.dark-mode .input-group-text{background:#1e293b;border-color:#334155;color:#94a3b8;}
+    #toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+    .chart-card{background:white;border-radius:var(--card-radius);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    body.dark-mode .chart-card{background:var(--dark);}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .section-title{font-size:22px;font-weight:700;margin:0;}
+    .filter-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .btn-action{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;}
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-260px);}
+      .sidebar.mobile-open{transform:translateX(0);}
+      .main-content{margin-left:0!important;}
+      .sidebar-overlay.active{display:block;}
+      .topbar{padding:10px 14px;}
+      .topbar .topbar-clock{display:none;}
+      .content-area{padding:14px;}
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
-    </header>
-    <main>
-        <div class="container">
-            <div class="card">
-                <h2>Welcome to the Admin Dashboard</h2>
-                <p>Manage your transport company efficiently.</p>
-            </div>
-            <div class="card">
-                <h3>Statistics</h3>
-                <p>Total Vehicles: 15</p>
-                <p>Total Drivers: 8</p>
-                <p>Active Trips: 5</p>
-            </div>
-            <div class="card">
-                <h3>Actions</h3>
-                <button>Add Vehicle</button>
-                <button>View Drivers</button>
-                <button>Manage Trips</button>
-            </div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-bus-front"></i></div>
+    <div class="brand-name">ProDrive</div>
+    <div class="brand-sub">Admin Portal</div>
+  </div>
+  <nav style="flex:1;padding-top:8px;">
+    <div class="nav-section-header">Overview</div>
+    <a class="nav-item-link active" id="nav-dashboard" onclick="showView('dashboard')" aria-label="Dashboard"><i class="bi bi-grid"></i><span>Dashboard</span></a>
+    <div class="nav-section-header">Manage</div>
+    <a class="nav-item-link" id="nav-companies" onclick="showView('companies')" aria-label="Companies"><i class="bi bi-building"></i><span>Companies</span></a>
+    <a class="nav-item-link" id="nav-drivers" onclick="showView('drivers')" aria-label="Drivers"><i class="bi bi-person-badge"></i><span>Drivers</span></a>
+    <a class="nav-item-link" id="nav-vehicles" onclick="showView('vehicles')" aria-label="Vehicles"><i class="bi bi-truck"></i><span>Vehicles</span></a>
+    <div class="nav-section-header">Compliance</div>
+    <a class="nav-item-link" id="nav-incidents" onclick="showView('incidents')" aria-label="Incidents"><i class="bi bi-exclamation-triangle"></i><span>Incidents</span></a>
+    <a class="nav-item-link" id="nav-documents" onclick="showView('documents')" aria-label="Documents"><i class="bi bi-folder"></i><span>Documents</span></a>
+    <div class="nav-section-header">Administration</div>
+    <a class="nav-item-link" id="nav-forms" onclick="showView('forms')" aria-label="Forms and SMS"><i class="bi bi-file-text"></i><span>Forms &amp; SMS</span></a>
+    <a class="nav-item-link" id="nav-settings" onclick="showView('settings')" aria-label="Settings"><i class="bi bi-gear"></i><span>Settings</span></a>
+  </nav>
+  <div class="sidebar-footer">
+    <button id="darkModeBtn" onclick="toggleDarkMode()" aria-label="Toggle dark mode" title="Toggle dark mode"><i class="bi bi-moon" id="darkModeIcon"></i></button>
+    <button onclick="toggleSidebarCollapse()" aria-label="Collapse sidebar" title="Collapse sidebar"><i class="bi bi-layout-sidebar-reverse"></i></button>
+  </div>
+</aside>
+<div class="main-content" id="mainContent">
+  <div class="topbar" id="topbar">
+    <button class="hamburger" onclick="toggleMobileSidebar()" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+    <div class="breadcrumb-area">
+      <nav aria-label="breadcrumb"><ol class="breadcrumb mb-0" id="breadcrumb"><li class="breadcrumb-item active">Dashboard</li></ol></nav>
+    </div>
+    <span class="topbar-clock" id="topbar-clock" aria-live="polite"></span>
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search..." aria-label="Global search" id="globalSearch" />
+    </div>
+    <button class="notif-btn" aria-label="Notifications (3 unread)"><i class="bi bi-bell"></i><span class="notif-badge">3</span></button>
+    <div class="dropdown">
+      <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu" id="userAvatarBtn" role="button" tabindex="0">AD</div>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><h6 class="dropdown-header">Admin User</h6></li>
+        <li><a class="dropdown-item" href="#" onclick="showView('settings')"><i class="bi bi-person me-2"></i>Profile</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="content-area">
+
+    <!-- DASHBOARD -->
+    <section class="view-section active" id="view-dashboard">
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex align-items-center gap-3"><div class="stat-icon" style="background:var(--soft);color:var(--primary)"><i class="bi bi-building"></i></div><div><div class="fw-bold fs-4">42</div><div class="text-muted small">Total Companies</div></div></div></div></div>
+        <div class="col-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex align-items-center gap-3"><div class="stat-icon" style="background:#ecfeff;color:var(--accent)"><i class="bi bi-person-badge"></i></div><div><div class="fw-bold fs-4">187</div><div class="text-muted small">Total Drivers</div></div></div></div></div>
+        <div class="col-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex align-items-center gap-3"><div class="stat-icon" style="background:#ecfdf5;color:var(--success)"><i class="bi bi-truck"></i></div><div><div class="fw-bold fs-4">315</div><div class="text-muted small">Total Vehicles</div></div></div></div></div>
+        <div class="col-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex align-items-center gap-3"><div class="stat-icon" style="background:#fef2f2;color:var(--danger)"><i class="bi bi-exclamation-triangle"></i></div><div><div class="fw-bold fs-4">3</div><div class="text-muted small">Active Incidents</div></div></div></div></div>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-lg-8"><div class="chart-card h-100"><h6 class="fw-bold mb-3">Monthly Registrations</h6><canvas id="monthlyChart" height="130" aria-label="Monthly registrations bar chart"></canvas></div></div>
+        <div class="col-lg-4"><div class="chart-card h-100"><h6 class="fw-bold mb-3">Vehicle Status</h6><canvas id="vehicleStatusChart" height="200" aria-label="Vehicle status doughnut chart"></canvas></div></div>
+      </div>
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="table-container">
+            <div class="d-flex align-items-center justify-content-between p-3 pb-0"><h6 class="fw-bold mb-0">Recent Companies</h6></div>
+            <div class="table-responsive"><table class="table"><thead><tr><th>Company</th><th>Contact</th><th>Drivers</th><th>Status</th><th>Date</th></tr></thead><tbody>
+              <tr><td>FastFreight Pty Ltd</td><td>John Smith</td><td>24</td><td><span class="badge bg-success">Active</span></td><td>Jan 2024</td></tr>
+              <tr><td>MegaTrans Solutions</td><td>Sarah Lee</td><td>15</td><td><span class="badge bg-success">Active</span></td><td>Jan 2024</td></tr>
+              <tr><td>BlueLine Logistics</td><td>Mike Davis</td><td>8</td><td><span class="badge bg-warning text-dark">Pending</span></td><td>Dec 2023</td></tr>
+              <tr><td>PrimeCargo Co.</td><td>Emma Wilson</td><td>31</td><td><span class="badge bg-success">Active</span></td><td>Dec 2023</td></tr>
+              <tr><td>SwiftMove Transport</td><td>David Brown</td><td>5</td><td><span class="badge bg-danger">Suspended</span></td><td>Nov 2023</td></tr>
+            </tbody></table></div>
+          </div>
         </div>
-    </main>
+        <div class="col-lg-4">
+          <div class="card p-3 h-100">
+            <h6 class="fw-bold mb-3">Quick Actions</h6>
+            <div class="d-flex flex-column gap-2">
+              <button class="btn btn-primary" onclick="showView('companies');setTimeout(()=>new bootstrap.Modal(document.getElementById('companyModal')).show(),300)" aria-label="Add Company"><i class="bi bi-plus-circle me-2"></i>Add Company</button>
+              <button class="btn btn-outline-primary" onclick="showView('drivers');setTimeout(()=>new bootstrap.Modal(document.getElementById('driverModal')).show(),300)" aria-label="Add Driver"><i class="bi bi-person-plus me-2"></i>Add Driver</button>
+              <button class="btn btn-outline-secondary" onclick="showView('incidents')" aria-label="View Reports"><i class="bi bi-bar-chart me-2"></i>View Reports</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPANIES -->
+    <section class="view-section" id="view-companies">
+      <div class="section-header"><h1 class="section-title">Companies</h1><button class="btn btn-primary" onclick="openCompanyModal()" aria-label="Add Company"><i class="bi bi-plus-lg me-1"></i>Add Company</button></div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search companies..." id="companySearch" oninput="filterTable('companySearch','companyStatusFilter','companiesTable')" aria-label="Search companies" /></div>
+        <select class="form-select" id="companyStatusFilter" onchange="filterTable('companySearch','companyStatusFilter','companiesTable')" aria-label="Filter by status" style="max-width:160px"><option value="">All Status</option><option>Active</option><option>Pending</option><option>Suspended</option></select>
+      </div>
+      <div class="table-container"><div class="table-responsive"><table class="table" id="companiesTable">
+        <thead><tr><th>Company Name</th><th>ABN</th><th>Contact</th><th>Drivers</th><th>Vehicles</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>FastFreight Pty Ltd</td><td>12 345 678 901</td><td>John Smith</td><td>24</td><td>38</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing FastFreight Pty Ltd','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('FastFreight Pty Ltd')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('FastFreight Pty Ltd')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>MegaTrans Solutions</td><td>98 765 432 109</td><td>Sarah Lee</td><td>15</td><td>22</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing MegaTrans Solutions','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('MegaTrans Solutions')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('MegaTrans Solutions')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>BlueLine Logistics</td><td>45 678 901 234</td><td>Mike Davis</td><td>8</td><td>12</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing BlueLine Logistics','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('BlueLine Logistics')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('BlueLine Logistics')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>PrimeCargo Co.</td><td>67 890 123 456</td><td>Emma Wilson</td><td>31</td><td>45</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing PrimeCargo Co.','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('PrimeCargo Co.')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('PrimeCargo Co.')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>SwiftMove Transport</td><td>23 456 789 012</td><td>David Brown</td><td>5</td><td>9</td><td><span class="badge bg-danger">Suspended</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing SwiftMove Transport','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('SwiftMove Transport')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('SwiftMove Transport')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>RedRoad Haulage</td><td>89 012 345 678</td><td>Lisa Chen</td><td>18</td><td>27</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing RedRoad Haulage','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('RedRoad Haulage')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('RedRoad Haulage')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>NorthStar Freight</td><td>34 567 890 123</td><td>Tom White</td><td>11</td><td>16</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing NorthStar Freight','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('NorthStar Freight')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('NorthStar Freight')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>SunCoast Carriers</td><td>56 789 012 345</td><td>Amy Park</td><td>7</td><td>11</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing SunCoast Carriers','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openCompanyModal('SunCoast Carriers')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('SunCoast Carriers')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+        </tbody>
+      </table></div></div>
+      <nav aria-label="Companies pagination" class="mt-3"><ul class="pagination pagination-sm justify-content-end"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">3</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
+    </section>
+
+    <!-- DRIVERS -->
+    <section class="view-section" id="view-drivers">
+      <div class="section-header"><h1 class="section-title">Drivers</h1><button class="btn btn-primary" onclick="openDriverModal()" aria-label="Add Driver"><i class="bi bi-plus-lg me-1"></i>Add Driver</button></div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search drivers..." id="driverSearch" oninput="filterTable('driverSearch','driverStatusFilter','driversTable')" aria-label="Search drivers" /></div>
+        <select class="form-select" id="driverStatusFilter" onchange="filterTable('driverSearch','driverStatusFilter','driversTable')" aria-label="Filter by status" style="max-width:160px"><option value="">All Status</option><option>Active</option><option>Inactive</option><option>Suspended</option></select>
+      </div>
+      <div class="table-container"><div class="table-responsive"><table class="table" id="driversTable">
+        <thead><tr><th>Name</th><th>License #</th><th>License Type</th><th>Expiry</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>James Cooper</td><td>LIC-10234</td><td>HC</td><td>2025-06-15</td><td>FastFreight Pty Ltd</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing James Cooper','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('James Cooper')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('James Cooper')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Maria Santos</td><td>LIC-20891</td><td>MC</td><td>2024-11-30</td><td>MegaTrans Solutions</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Maria Santos','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Maria Santos')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Maria Santos')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Robert King</td><td>LIC-30567</td><td>C</td><td>2025-03-22</td><td>BlueLine Logistics</td><td><span class="badge bg-danger">Suspended</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Robert King','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Robert King')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Robert King')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Angela Patel</td><td>LIC-40123</td><td>HC</td><td>2026-01-10</td><td>PrimeCargo Co.</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Angela Patel','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Angela Patel')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Angela Patel')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Derek Nguyen</td><td>LIC-50789</td><td>MC</td><td>2025-09-05</td><td>FastFreight Pty Ltd</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Derek Nguyen','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Derek Nguyen')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Derek Nguyen')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Claire Foster</td><td>LIC-60456</td><td>C</td><td>2024-12-18</td><td>RedRoad Haulage</td><td><span class="badge bg-danger">Inactive</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Claire Foster','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Claire Foster')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Claire Foster')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Samuel Torres</td><td>LIC-70312</td><td>HC</td><td>2026-04-27</td><td>NorthStar Freight</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Samuel Torres','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Samuel Torres')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Samuel Torres')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>Rachel Kim</td><td>LIC-80654</td><td>MC</td><td>2025-07-14</td><td>SunCoast Carriers</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing Rachel Kim','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openDriverModal('Rachel Kim')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('Rachel Kim')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+        </tbody>
+      </table></div></div>
+      <nav aria-label="Drivers pagination" class="mt-3"><ul class="pagination pagination-sm justify-content-end"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
+    </section>
+
+    <!-- VEHICLES -->
+    <section class="view-section" id="view-vehicles">
+      <div class="section-header"><h1 class="section-title">Vehicles</h1><button class="btn btn-primary" onclick="openVehicleModal()" aria-label="Add Vehicle"><i class="bi bi-plus-lg me-1"></i>Add Vehicle</button></div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search vehicles..." id="vehicleSearch" oninput="filterTable('vehicleSearch','vehicleTypeFilter','vehiclesTable')" aria-label="Search vehicles" /></div>
+        <select class="form-select" id="vehicleTypeFilter" onchange="filterTable('vehicleSearch','vehicleTypeFilter','vehiclesTable')" aria-label="Filter by type" style="max-width:160px"><option value="">All Types</option><option>Truck</option><option>Van</option><option>Bus</option><option>Car</option></select>
+      </div>
+      <div class="table-container"><div class="table-responsive"><table class="table" id="vehiclesTable">
+        <thead><tr><th>Registration</th><th>Make/Model</th><th>Year</th><th>Company</th><th>Driver</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>ABC-123</td><td>Kenworth T610</td><td>2022</td><td>FastFreight Pty Ltd</td><td>James Cooper</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing ABC-123','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('ABC-123')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('ABC-123')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>DEF-456</td><td>Volvo FH16</td><td>2021</td><td>MegaTrans Solutions</td><td>Maria Santos</td><td><span class="badge bg-info text-dark">Maintenance</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing DEF-456','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('DEF-456')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('DEF-456')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>GHI-789</td><td>Mercedes Actros</td><td>2023</td><td>PrimeCargo Co.</td><td>Angela Patel</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing GHI-789','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('GHI-789')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('GHI-789')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>JKL-012</td><td>Isuzu NPS</td><td>2020</td><td>BlueLine Logistics</td><td>&#8212;</td><td><span class="badge bg-danger">Inactive</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing JKL-012','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('JKL-012')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('JKL-012')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>MNO-345</td><td>DAF XF</td><td>2022</td><td>RedRoad Haulage</td><td>Derek Nguyen</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing MNO-345','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('MNO-345')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('MNO-345')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>PQR-678</td><td>Scania R500</td><td>2023</td><td>FastFreight Pty Ltd</td><td>&#8212;</td><td><span class="badge bg-info text-dark">Maintenance</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing PQR-678','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('PQR-678')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('PQR-678')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>STU-901</td><td>MAN TGX</td><td>2021</td><td>NorthStar Freight</td><td>Samuel Torres</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing STU-901','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('STU-901')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('STU-901')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>VWX-234</td><td>Mack Anthem</td><td>2022</td><td>SunCoast Carriers</td><td>Rachel Kim</td><td><span class="badge bg-success">Active</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing VWX-234','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="openVehicleModal('VWX-234')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('VWX-234')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+        </tbody>
+      </table></div></div>
+      <nav aria-label="Vehicles pagination" class="mt-3"><ul class="pagination pagination-sm justify-content-end"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
+    </section>
+
+    <!-- INCIDENTS -->
+    <section class="view-section" id="view-incidents">
+      <div class="section-header"><h1 class="section-title">Incidents</h1><button class="btn btn-primary" onclick="showToast('Report Incident modal coming soon','info')" aria-label="Report Incident"><i class="bi bi-plus-lg me-1"></i>Report Incident</button></div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search incidents..." id="incidentSearch" oninput="filterTable('incidentSearch','incidentSeverityFilter','incidentsTable')" aria-label="Search incidents" /></div>
+        <select class="form-select" id="incidentSeverityFilter" onchange="filterTable('incidentSearch','incidentSeverityFilter','incidentsTable')" aria-label="Filter by severity" style="max-width:160px"><option value="">All Severity</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select>
+      </div>
+      <div class="table-container"><div class="table-responsive"><table class="table" id="incidentsTable">
+        <thead><tr><th>ID</th><th>Date</th><th>Type</th><th>Driver</th><th>Severity</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>INC-001</td><td>2024-01-08</td><td>Rear-end Collision</td><td>James Cooper</td><td><span class="badge bg-danger">High</span></td><td><span class="badge bg-warning text-dark">Open</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing INC-001','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="showToast('Editing INC-001','info')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('INC-001')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>INC-002</td><td>2024-01-12</td><td>Cargo Spill</td><td>Derek Nguyen</td><td><span class="badge bg-warning text-dark">Medium</span></td><td><span class="badge bg-info text-dark">Under Review</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing INC-002','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="showToast('Editing INC-002','info')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('INC-002')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>INC-003</td><td>2024-01-15</td><td>Near Miss</td><td>Maria Santos</td><td><span class="badge bg-secondary">Low</span></td><td><span class="badge bg-success">Closed</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing INC-003','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="showToast('Editing INC-003','info')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('INC-003')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>INC-004</td><td>2024-01-18</td><td>Mechanical Failure</td><td>Samuel Torres</td><td><span class="badge bg-dark">Critical</span></td><td><span class="badge bg-warning text-dark">Open</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing INC-004','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="showToast('Editing INC-004','info')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('INC-004')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+          <tr><td>INC-005</td><td>2024-01-20</td><td>Minor Scrape</td><td>Rachel Kim</td><td><span class="badge bg-secondary">Low</span></td><td><span class="badge bg-success">Closed</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing INC-005','info')" aria-label="View"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline-secondary btn-action" onclick="showToast('Editing INC-005','info')" aria-label="Edit"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger btn-action" onclick="confirmDelete('INC-005')" aria-label="Delete"><i class="bi bi-trash"></i></button></div></td></tr>
+        </tbody>
+      </table></div></div>
+    </section>
+
+    <!-- DOCUMENTS -->
+    <section class="view-section" id="view-documents">
+      <div class="section-header"><h1 class="section-title">Documents</h1><button class="btn btn-primary" onclick="showToast('Upload Document feature coming soon','info')" aria-label="Upload Document"><i class="bi bi-upload me-1"></i>Upload Document</button></div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search documents..." id="docSearch" oninput="filterDocs()" aria-label="Search documents" /></div>
+        <select class="form-select" id="docCategoryFilter" onchange="filterDocs()" aria-label="Filter by category" style="max-width:180px"><option value="">All Categories</option><option>Insurance</option><option>Registration</option><option>Compliance</option><option>Safety</option><option>Maintenance</option></select>
+      </div>
+      <div class="row g-3" id="docGrid">
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Insurance Certificate" data-category="Insurance"><div class="doc-card"><span class="doc-icon text-primary"><i class="bi bi-file-earmark-text"></i></span><div class="fw-semibold mb-1">Insurance Certificate</div><span class="badge bg-primary mb-2">Insurance</span><div class="small text-muted">Uploaded: 2024-01-10</div><div class="mt-2"><span class="badge bg-success">Valid</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Insurance Certificate','info')" aria-label="Download Insurance Certificate"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Insurance Certificate')" aria-label="Delete Insurance Certificate"><i class="bi bi-trash"></i></button></div></div></div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Vehicle Registration Bundle" data-category="Registration"><div class="doc-card"><span class="doc-icon text-success"><i class="bi bi-file-earmark-check"></i></span><div class="fw-semibold mb-1">Vehicle Registration Bundle</div><span class="badge bg-success mb-2">Registration</span><div class="small text-muted">Uploaded: 2024-01-08</div><div class="mt-2"><span class="badge bg-success">Valid</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Vehicle Registration Bundle','info')" aria-label="Download Vehicle Registration Bundle"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Vehicle Registration Bundle')" aria-label="Delete Vehicle Registration Bundle"><i class="bi bi-trash"></i></button></div></div></div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Driver License Records" data-category="Compliance"><div class="doc-card"><span class="doc-icon text-info"><i class="bi bi-file-earmark-person"></i></span><div class="fw-semibold mb-1">Driver License Records</div><span class="badge bg-info text-dark mb-2">Compliance</span><div class="small text-muted">Uploaded: 2024-01-05</div><div class="mt-2"><span class="badge bg-success">Valid</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Driver License Records','info')" aria-label="Download Driver License Records"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Driver License Records')" aria-label="Delete Driver License Records"><i class="bi bi-trash"></i></button></div></div></div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Safety Management Plan" data-category="Safety"><div class="doc-card"><span class="doc-icon text-warning"><i class="bi bi-file-earmark-medical"></i></span><div class="fw-semibold mb-1">Safety Management Plan</div><span class="badge bg-warning text-dark mb-2">Safety</span><div class="small text-muted">Uploaded: 2023-12-15</div><div class="mt-2"><span class="badge bg-warning text-dark">Expiring Soon</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Safety Management Plan','info')" aria-label="Download Safety Management Plan"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Safety Management Plan')" aria-label="Delete Safety Management Plan"><i class="bi bi-trash"></i></button></div></div></div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Fleet Maintenance Log" data-category="Maintenance"><div class="doc-card"><span class="doc-icon text-secondary"><i class="bi bi-file-earmark-code"></i></span><div class="fw-semibold mb-1">Fleet Maintenance Log</div><span class="badge bg-secondary mb-2">Maintenance</span><div class="small text-muted">Uploaded: 2024-01-18</div><div class="mt-2"><span class="badge bg-success">Valid</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Fleet Maintenance Log','info')" aria-label="Download Fleet Maintenance Log"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Fleet Maintenance Log')" aria-label="Delete Fleet Maintenance Log"><i class="bi bi-trash"></i></button></div></div></div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 doc-card-wrap" data-name="Accreditation Certificate" data-category="Compliance"><div class="doc-card"><span class="doc-icon text-danger"><i class="bi bi-file-earmark-x"></i></span><div class="fw-semibold mb-1">Accreditation Certificate</div><span class="badge bg-info text-dark mb-2">Compliance</span><div class="small text-muted">Uploaded: 2023-11-20</div><div class="mt-2"><span class="badge bg-danger">Expired</span></div><div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" onclick="showToast('Downloading Accreditation Certificate','info')" aria-label="Download Accreditation Certificate"><i class="bi bi-download me-1"></i>Download</button><button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('Accreditation Certificate')" aria-label="Delete Accreditation Certificate"><i class="bi bi-trash"></i></button></div></div></div>
+      </div>
+    </section>
+
+    <!-- FORMS & SMS -->
+    <section class="view-section" id="view-forms">
+      <div class="section-header"><h1 class="section-title">Forms &amp; SMS</h1></div>
+      <div class="row g-3 mb-4">
+        <div class="col-4"><div class="card p-3 text-center"><div class="fw-bold fs-3 text-warning">12</div><div class="small text-muted">Pending Submissions</div></div></div>
+        <div class="col-4"><div class="card p-3 text-center"><div class="fw-bold fs-3 text-success">8</div><div class="small text-muted">Approved Today</div></div></div>
+        <div class="col-4"><div class="card p-3 text-center"><div class="fw-bold fs-3 text-primary">156</div><div class="small text-muted">Total Forms</div></div></div>
+      </div>
+      <div class="filter-row">
+        <div class="input-group" style="max-width:260px"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" class="form-control" placeholder="Search forms..." id="formSearch" oninput="filterTable('formSearch','formStatusFilter','formsTable')" aria-label="Search forms" /></div>
+        <select class="form-select" id="formStatusFilter" onchange="filterTable('formSearch','formStatusFilter','formsTable')" aria-label="Filter by status" style="max-width:160px"><option value="">All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+      </div>
+      <div class="table-container"><div class="table-responsive"><table class="table" id="formsTable">
+        <thead><tr><th>Form Name</th><th>Submitted By</th><th>Company</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>Pre-Trip Inspection Form</td><td>James Cooper</td><td>FastFreight Pty Ltd</td><td>2024-01-20</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-success btn-action" onclick="showToast('Form approved successfully','success')" aria-label="Approve"><i class="bi bi-check-lg"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="showToast('Form rejected','error')" aria-label="Reject"><i class="bi bi-x-lg"></i></button></div></td></tr>
+          <tr><td>Fatigue Management Declaration</td><td>Maria Santos</td><td>MegaTrans Solutions</td><td>2024-01-20</td><td><span class="badge bg-success">Approved</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing form','info')" aria-label="View"><i class="bi bi-eye"></i></button></div></td></tr>
+          <tr><td>Incident Report Form</td><td>Samuel Torres</td><td>NorthStar Freight</td><td>2024-01-19</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-success btn-action" onclick="showToast('Form approved successfully','success')" aria-label="Approve"><i class="bi bi-check-lg"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="showToast('Form rejected','error')" aria-label="Reject"><i class="bi bi-x-lg"></i></button></div></td></tr>
+          <tr><td>Vehicle Defect Report</td><td>Angela Patel</td><td>PrimeCargo Co.</td><td>2024-01-19</td><td><span class="badge bg-success">Approved</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing form','info')" aria-label="View"><i class="bi bi-eye"></i></button></div></td></tr>
+          <tr><td>Load Restraint Checklist</td><td>Derek Nguyen</td><td>FastFreight Pty Ltd</td><td>2024-01-18</td><td><span class="badge bg-danger">Rejected</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary btn-action" onclick="showToast('Viewing form','info')" aria-label="View"><i class="bi bi-eye"></i></button></div></td></tr>
+          <tr><td>Chain of Responsibility Declaration</td><td>Rachel Kim</td><td>SunCoast Carriers</td><td>2024-01-18</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-success btn-action" onclick="showToast('Form approved successfully','success')" aria-label="Approve"><i class="bi bi-check-lg"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="showToast('Form rejected','error')" aria-label="Reject"><i class="bi bi-x-lg"></i></button></div></td></tr>
+        </tbody>
+      </table></div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view-section" id="view-settings">
+      <div class="section-header"><h1 class="section-title">Settings</h1></div>
+      <div class="card p-3">
+        <ul class="nav nav-tabs mb-3" id="settingsTabs" role="tablist">
+          <li class="nav-item" role="presentation"><button class="nav-link active" id="tab-profile-btn" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">Profile</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" id="tab-security-btn" data-bs-toggle="tab" data-bs-target="#tab-security" type="button" role="tab" aria-controls="tab-security" aria-selected="false">Security</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" id="tab-notif-btn" data-bs-toggle="tab" data-bs-target="#tab-notif" type="button" role="tab" aria-controls="tab-notif" aria-selected="false">Notifications</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" id="tab-system-btn" data-bs-toggle="tab" data-bs-target="#tab-system" type="button" role="tab" aria-controls="tab-system" aria-selected="false">System</button></li>
+        </ul>
+        <div class="tab-content" id="settingsTabContent">
+          <div class="tab-pane fade show active" id="tab-profile" role="tabpanel" aria-labelledby="tab-profile-btn">
+            <form id="profileForm" class="row g-3" style="max-width:540px" novalidate>
+              <div class="col-md-6"><label class="form-label">First Name</label><input type="text" class="form-control" value="Admin" required aria-label="First Name" /></div>
+              <div class="col-md-6"><label class="form-label">Last Name</label><input type="text" class="form-control" value="User" required aria-label="Last Name" /></div>
+              <div class="col-12"><label class="form-label">Email</label><input type="email" class="form-control" value="admin@prodrive.com.au" required aria-label="Email" /></div>
+              <div class="col-md-6"><label class="form-label">Role</label><input type="text" class="form-control" value="Super Admin" readonly aria-label="Role" /></div>
+              <div class="col-md-6"><label class="form-label">Phone</label><input type="tel" class="form-control" value="+61 400 000 000" aria-label="Phone" /></div>
+              <div class="col-12"><button type="button" class="btn btn-primary" onclick="showToast('Profile saved successfully','success')" aria-label="Save profile">Save Profile</button></div>
+            </form>
+          </div>
+          <div class="tab-pane fade" id="tab-security" role="tabpanel" aria-labelledby="tab-security-btn">
+            <form style="max-width:400px" novalidate>
+              <h6 class="fw-bold mb-3">Change Password</h6>
+              <div class="mb-3"><label class="form-label">Current Password</label><input type="password" class="form-control" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" aria-label="Current password" /></div>
+              <div class="mb-3"><label class="form-label">New Password</label><input type="password" class="form-control" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" aria-label="New password" /></div>
+              <div class="mb-3"><label class="form-label">Confirm New Password</label><input type="password" class="form-control" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" aria-label="Confirm new password" /></div>
+              <button type="button" class="btn btn-primary mb-4" onclick="showToast('Password updated successfully','success')" aria-label="Update password">Update Password</button>
+              <hr>
+              <h6 class="fw-bold mb-3">Two-Factor Authentication</h6>
+              <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="twoFaToggle" role="switch" aria-label="Enable 2FA" /><label class="form-check-label" for="twoFaToggle">Enable 2FA</label></div>
+            </form>
+          </div>
+          <div class="tab-pane fade" id="tab-notif" role="tabpanel" aria-labelledby="tab-notif-btn">
+            <div style="max-width:400px">
+              <h6 class="fw-bold mb-3">Notification Preferences</h6>
+              <div class="d-flex flex-column gap-3">
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="emailNotif" checked role="switch" aria-label="Email Notifications" /><label class="form-check-label" for="emailNotif">Email Notifications</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="smsAlerts" checked role="switch" aria-label="SMS Alerts" /><label class="form-check-label" for="smsAlerts">SMS Alerts</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="incidentAlerts" checked role="switch" aria-label="Incident Alerts" /><label class="form-check-label" for="incidentAlerts">Incident Alerts</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="weeklyReports" role="switch" aria-label="Weekly Reports" /><label class="form-check-label" for="weeklyReports">Weekly Reports</label></div>
+              </div>
+              <button class="btn btn-primary mt-3" onclick="showToast('Notification preferences saved','success')" aria-label="Save notification preferences">Save Preferences</button>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="tab-system" role="tabpanel" aria-labelledby="tab-system-btn">
+            <div style="max-width:480px">
+              <div class="card p-3 mb-3">
+                <h6 class="fw-bold">System Information</h6>
+                <div class="row small"><div class="col-6 text-muted">Version</div><div class="col-6">ProDrive v2.4.1</div><div class="col-6 text-muted">Build</div><div class="col-6">2024.01.20</div><div class="col-6 text-muted">Environment</div><div class="col-6">Production</div><div class="col-6 text-muted">Database</div><div class="col-6">Connected &#10003;</div></div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" onclick="showToast('Data export initiated','info')" aria-label="Export data"><i class="bi bi-download me-1"></i>Export Data</button>
+                <button class="btn btn-outline-warning" onclick="showToast('Cache cleared successfully','success')" aria-label="Clear cache"><i class="bi bi-trash me-1"></i>Clear Cache</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Company Modal -->
+<div class="modal fade" id="companyModal" tabindex="-1" role="dialog" aria-labelledby="companyModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="companyModalLabel">Add Company</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body"><form id="companyForm" class="needs-validation" novalidate><div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Company Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="cName" required aria-label="Company Name" /><div class="invalid-feedback">Company name is required.</div></div>
+      <div class="col-md-6"><label class="form-label">ABN <span class="text-danger">*</span></label><input type="text" class="form-control" id="cAbn" required pattern="\d{2}\s\d{3}\s\d{3}\s\d{3}" placeholder="12 345 678 901" aria-label="ABN" /><div class="invalid-feedback">Enter a valid ABN (e.g. 12 345 678 901).</div></div>
+      <div class="col-md-6"><label class="form-label">Contact Name</label><input type="text" class="form-control" id="cContact" aria-label="Contact Name" /></div>
+      <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" id="cEmail" aria-label="Email" /></div>
+      <div class="col-md-6"><label class="form-label">Phone</label><input type="tel" class="form-control" id="cPhone" aria-label="Phone" /></div>
+      <div class="col-md-6"><label class="form-label">Status</label><select class="form-select" id="cStatus" aria-label="Status"><option>Active</option><option>Pending</option><option>Suspended</option></select></div>
+      <div class="col-12"><label class="form-label">Address</label><input type="text" class="form-control" id="cAddress" aria-label="Address" /></div>
+    </div></form></div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">Cancel</button><button type="button" class="btn btn-primary" onclick="saveCompany()" aria-label="Save company">Save Company</button></div>
+  </div></div>
+</div>
+
+<!-- Driver Modal -->
+<div class="modal fade" id="driverModal" tabindex="-1" role="dialog" aria-labelledby="driverModalLabel" aria-modal="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="driverModalLabel">Add Driver</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body"><form id="driverForm" class="needs-validation" novalidate><div class="row g-3">
+      <div class="col-md-6"><label class="form-label">First Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="dFirst" required aria-label="First Name" /><div class="invalid-feedback">First name is required.</div></div>
+      <div class="col-md-6"><label class="form-label">Last Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="dLast" required aria-label="Last Name" /><div class="invalid-feedback">Last name is required.</div></div>
+      <div class="col-md-6"><label class="form-label">License #</label><input type="text" class="form-control" id="dLic" aria-label="License number" /></div>
+      <div class="col-md-6"><label class="form-label">License Type</label><select class="form-select" id="dLicType" aria-label="License type"><option>HC</option><option>MC</option><option>C</option></select></div>
+      <div class="col-md-6"><label class="form-label">Expiry Date</label><input type="date" class="form-control" id="dExpiry" aria-label="Expiry date" /></div>
+      <div class="col-md-6"><label class="form-label">Status</label><select class="form-select" id="dStatus" aria-label="Status"><option>Active</option><option>Inactive</option><option>Suspended</option></select></div>
+      <div class="col-12"><label class="form-label">Company</label><select class="form-select" id="dCompany" aria-label="Company"><option>FastFreight Pty Ltd</option><option>MegaTrans Solutions</option><option>BlueLine Logistics</option><option>PrimeCargo Co.</option><option>SwiftMove Transport</option><option>RedRoad Haulage</option><option>NorthStar Freight</option><option>SunCoast Carriers</option></select></div>
+    </div></form></div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">Cancel</button><button type="button" class="btn btn-primary" onclick="saveDriver()" aria-label="Save driver">Save Driver</button></div>
+  </div></div>
+</div>
+
+<!-- Vehicle Modal -->
+<div class="modal fade" id="vehicleModal" tabindex="-1" role="dialog" aria-labelledby="vehicleModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="vehicleModalLabel">Add Vehicle</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body"><form id="vehicleForm" class="needs-validation" novalidate><div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Registration <span class="text-danger">*</span></label><input type="text" class="form-control" id="vReg" required aria-label="Registration" /><div class="invalid-feedback">Registration is required.</div></div>
+      <div class="col-md-4"><label class="form-label">Make</label><input type="text" class="form-control" id="vMake" aria-label="Make" /></div>
+      <div class="col-md-4"><label class="form-label">Model</label><input type="text" class="form-control" id="vModel" aria-label="Model" /></div>
+      <div class="col-md-4"><label class="form-label">Year</label><input type="number" class="form-control" id="vYear" min="2000" max="2030" aria-label="Year" /></div>
+      <div class="col-md-4"><label class="form-label">Type</label><select class="form-select" id="vType" aria-label="Vehicle type"><option>Truck</option><option>Van</option><option>Bus</option><option>Car</option></select></div>
+      <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" id="vStatus" aria-label="Status"><option>Active</option><option>Maintenance</option><option>Inactive</option></select></div>
+      <div class="col-md-6"><label class="form-label">Company</label><select class="form-select" id="vCompany" aria-label="Company"><option>FastFreight Pty Ltd</option><option>MegaTrans Solutions</option><option>BlueLine Logistics</option><option>PrimeCargo Co.</option><option>SwiftMove Transport</option><option>RedRoad Haulage</option><option>NorthStar Freight</option><option>SunCoast Carriers</option></select></div>
+      <div class="col-md-6"><label class="form-label">Driver</label><select class="form-select" id="vDriver" aria-label="Driver"><option value="">&#8212; Unassigned &#8212;</option><option>James Cooper</option><option>Maria Santos</option><option>Robert King</option><option>Angela Patel</option><option>Derek Nguyen</option><option>Claire Foster</option><option>Samuel Torres</option><option>Rachel Kim</option></select></div>
+    </div></form></div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">Cancel</button><button type="button" class="btn btn-primary" onclick="saveVehicle()" aria-label="Save vehicle">Save Vehicle</button></div>
+  </div></div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-sm"><div class="modal-content">
+    <div class="modal-header border-0"><h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body text-center pb-0"><div class="text-danger mb-2" style="font-size:40px"><i class="bi bi-exclamation-triangle"></i></div><p id="deleteModalMsg" class="mb-0">Are you sure? This action cannot be undone.</p></div>
+    <div class="modal-footer border-0 justify-content-center gap-2"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel delete">Cancel</button><button type="button" class="btn btn-danger" id="confirmDeleteBtn" aria-label="Confirm delete">Delete</button></div>
+  </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var savedTheme = localStorage.getItem('prodrive_theme') || 'light';
+  if(savedTheme === 'dark'){document.body.classList.add('dark-mode');document.getElementById('darkModeIcon').className='bi bi-sun';}
+  document.documentElement.classList.remove('pre-dark');
+  if(localStorage.getItem('prodrive_sidebar_collapsed')==='true') document.body.classList.add('sidebar-collapsed');
+  showView(localStorage.getItem('prodrive_active_view')||'dashboard');
+  function updateClock(){
+    var now=new Date();
+    var opts={weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false};
+    document.getElementById('topbar-clock').textContent=now.toLocaleString('en-AU',opts);
+  }
+  updateClock(); setInterval(updateClock,1000);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') document.querySelectorAll('.modal.show').forEach(function(m){bootstrap.Modal.getInstance(m).hide();});
+  });
+  document.querySelectorAll('.modal').forEach(function(modal){
+    modal.addEventListener('shown.bs.modal',function(){
+      var f=modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if(f.length) f[0].focus();
+      modal.addEventListener('keydown',trapFocus);
+    });
+    modal.addEventListener('hidden.bs.modal',function(){modal.removeEventListener('keydown',trapFocus);});
+  });
+  function trapFocus(e){
+    if(e.key!=='Tab') return;
+    var modal=e.currentTarget;
+    var f=Array.from(modal.querySelectorAll('button:not([disabled]),[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'));
+    var first=f[0],last=f[f.length-1];
+    if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus();}}
+    else{if(document.activeElement===last){e.preventDefault();first.focus();}}
+  }
+  document.getElementById('confirmDeleteBtn').addEventListener('click',function(){
+    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+    showToast((window._deleteTarget||'Item')+' deleted successfully','success');
+    window._deleteTarget=null;
+  });
+});
+function showView(name){
+  document.querySelectorAll('.view-section').forEach(function(s){s.classList.remove('active');});
+  var t=document.getElementById('view-'+name);
+  if(t) t.classList.add('active');
+  setActiveNav(name); updateBreadcrumb(name);
+  localStorage.setItem('prodrive_active_view',name);
+  if(name==='dashboard') initCharts();
+}
+function setActiveNav(name){
+  document.querySelectorAll('.nav-item-link').forEach(function(l){l.classList.remove('active');});
+  var el=document.getElementById('nav-'+name);
+  if(el) el.classList.add('active');
+}
+var breadcrumbMap={
+  dashboard:[{l:'Dashboard',v:null}],
+  companies:[{l:'Dashboard',v:'dashboard'},{l:'Companies',v:null}],
+  drivers:[{l:'Dashboard',v:'dashboard'},{l:'Drivers',v:null}],
+  vehicles:[{l:'Dashboard',v:'dashboard'},{l:'Vehicles',v:null}],
+  incidents:[{l:'Dashboard',v:'dashboard'},{l:'Compliance',v:null},{l:'Incidents',v:null}],
+  documents:[{l:'Dashboard',v:'dashboard'},{l:'Compliance',v:null},{l:'Documents',v:null}],
+  forms:[{l:'Dashboard',v:'dashboard'},{l:'Administration',v:null},{l:'Forms & SMS',v:null}],
+  settings:[{l:'Dashboard',v:'dashboard'},{l:'Administration',v:null},{l:'Settings',v:null}]
+};
+function updateBreadcrumb(name){
+  var crumbs=breadcrumbMap[name]||[{l:name,v:null}];
+  var ol=document.getElementById('breadcrumb');
+  ol.innerHTML=crumbs.map(function(c,i){
+    if(i===crumbs.length-1) return '<li class="breadcrumb-item active" aria-current="page">'+c.l+'</li>';
+    if(c.v) return '<li class="breadcrumb-item"><a href="#" onclick="showView(\'' +c.v+ '\');return false;" style="color:var(--primary);text-decoration:none">'+c.l+'</a></li>';
+    return '<li class="breadcrumb-item text-muted">'+c.l+'</li>';
+  }).join('');
+}
+function toggleDarkMode(){
+  var isDark=document.body.classList.toggle('dark-mode');
+  document.getElementById('darkModeIcon').className=isDark?'bi bi-sun':'bi bi-moon';
+  localStorage.setItem('prodrive_theme',isDark?'dark':'light');
+}
+function toggleSidebarCollapse(){
+  var collapsed=document.body.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('prodrive_sidebar_collapsed',collapsed?'true':'false');
+}
+function toggleMobileSidebar(){
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+function filterTable(searchId,filterId,tableId){
+  var sv=document.getElementById(searchId).value.toLowerCase();
+  var fv=document.getElementById(filterId).value.toLowerCase();
+  document.querySelectorAll('#'+tableId+' tbody tr').forEach(function(row){
+    var txt=row.textContent.toLowerCase();
+    row.style.display=((!sv||txt.includes(sv))&&(!fv||txt.includes(fv)))?'':'none';
+  });
+}
+function filterDocs(){
+  var sv=document.getElementById('docSearch').value.toLowerCase();
+  var cv=document.getElementById('docCategoryFilter').value.toLowerCase();
+  document.querySelectorAll('.doc-card-wrap').forEach(function(c){
+    var n=(c.dataset.name||'').toLowerCase(),cat=(c.dataset.category||'').toLowerCase();
+    c.style.display=((!sv||n.includes(sv))&&(!cv||cat.includes(cv)))?'':'none';
+  });
+}
+var _monthlyChart=null,_vehicleChart=null;
+function initCharts(){
+  var mc=document.getElementById('monthlyChart');
+  var vc=document.getElementById('vehicleStatusChart');
+  if(_monthlyChart){_monthlyChart.destroy();_monthlyChart=null;}
+  if(_vehicleChart){_vehicleChart.destroy();_vehicleChart=null;}
+  _monthlyChart=new Chart(mc,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Companies',data:[3,2,4,3,5,4,6,3,4,5,3,2],backgroundColor:'rgba(37,99,235,0.7)',borderRadius:4},{label:'Drivers',data:[12,8,15,10,18,14,20,11,13,16,9,7],backgroundColor:'rgba(6,182,212,0.7)',borderRadius:4}]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'}},x:{grid:{display:false}}}}});
+  _vehicleChart=new Chart(vc,{type:'doughnut',data:{labels:['Active','Maintenance','Inactive'],datasets:[{data:[245,48,22],backgroundColor:['#2563eb','#f59e0b','#ef4444'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},cutout:'65%'}});
+}
+function showToast(message,type){
+  var c=document.getElementById('toast-container');
+  var cm={success:'#10b981',error:'#ef4444',warning:'#f59e0b',info:'#2563eb'};
+  var im={success:'bi-check-circle-fill',error:'bi-x-circle-fill',warning:'bi-exclamation-triangle-fill',info:'bi-info-circle-fill'};
+  var t=document.createElement('div');
+  t.className='toast show align-items-center text-white border-0 rounded-3 shadow';
+  t.style.cssText='background:'+(cm[type]||cm.info)+';min-width:260px;max-width:340px;';
+  t.setAttribute('role','alert'); t.setAttribute('aria-live','assertive');
+  t.innerHTML='<div class="d-flex align-items-center gap-2 p-3"><i class="bi '+(im[type]||im.info)+' fs-5"></i><span class="flex-fill" style="font-size:14px">'+message+'</span><button type="button" class="btn-close btn-close-white ms-2" aria-label="Close toast"></button></div>';
+  t.querySelector('.btn-close').addEventListener('click',function(){t.remove();});
+  c.appendChild(t); setTimeout(function(){if(t.parentNode)t.remove();},3000);
+}
+function openCompanyModal(editName){
+  var m=new bootstrap.Modal(document.getElementById('companyModal'));
+  document.getElementById('companyModalLabel').textContent=editName?'Edit Company':'Add Company';
+  document.getElementById('companyForm').classList.remove('was-validated');
+  if(!editName) document.getElementById('companyForm').reset();
+  m.show();
+}
+function saveCompany(){
+  var f=document.getElementById('companyForm');
+  f.classList.add('was-validated');
+  if(!f.checkValidity()) return;
+  bootstrap.Modal.getInstance(document.getElementById('companyModal')).hide();
+  f.classList.remove('was-validated');
+  showToast('Company saved successfully','success');
+}
+function openDriverModal(editName){
+  var m=new bootstrap.Modal(document.getElementById('driverModal'));
+  document.getElementById('driverModalLabel').textContent=editName?'Edit Driver':'Add Driver';
+  document.getElementById('driverForm').classList.remove('was-validated');
+  if(!editName) document.getElementById('driverForm').reset();
+  m.show();
+}
+function saveDriver(){
+  var f=document.getElementById('driverForm');
+  f.classList.add('was-validated');
+  if(!f.checkValidity()) return;
+  bootstrap.Modal.getInstance(document.getElementById('driverModal')).hide();
+  f.classList.remove('was-validated');
+  showToast('Driver saved successfully','success');
+}
+function openVehicleModal(editName){
+  var m=new bootstrap.Modal(document.getElementById('vehicleModal'));
+  document.getElementById('vehicleModalLabel').textContent=editName?'Edit Vehicle':'Add Vehicle';
+  document.getElementById('vehicleForm').classList.remove('was-validated');
+  if(!editName) document.getElementById('vehicleForm').reset();
+  m.show();
+}
+function saveVehicle(){
+  var f=document.getElementById('vehicleForm');
+  f.classList.add('was-validated');
+  if(!f.checkValidity()) return;
+  bootstrap.Modal.getInstance(document.getElementById('vehicleModal')).hide();
+  f.classList.remove('was-validated');
+  showToast('Vehicle saved successfully','success');
+}
+function confirmDelete(name){
+  window._deleteTarget=name;
+  document.getElementById('deleteModalMsg').innerHTML='Are you sure you want to delete <strong>'+name+'</strong>? This action cannot be undone.';
+  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
 </body>
 </html>
