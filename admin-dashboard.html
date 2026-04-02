@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script>
-    (function(){var t=localStorage.getItem('prodrive_theme');if(t==='dark')document.documentElement.classList.add('pre-dark');})();
+    (function(){var theme=localStorage.getItem('prodrive_theme');if(theme==='dark')document.documentElement.classList.add('pre-dark');})();
   </script>
   <style>
     :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-glow:rgba(37,99,235,.18);--dark:#0f172a;--dark2:#1e293b;--light-bg:#f8fafc;--soft:#eef4ff;--muted:#64748b;--card-radius:20px;--accent:#06b6d4;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;}
@@ -450,10 +450,9 @@ document.addEventListener('DOMContentLoaded', function(){
   document.documentElement.classList.remove('pre-dark');
   if(localStorage.getItem('prodrive_sidebar_collapsed')==='true') document.body.classList.add('sidebar-collapsed');
   showView(localStorage.getItem('prodrive_active_view')||'dashboard');
+  var clockOpts={weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false};
   function updateClock(){
-    var now=new Date();
-    var opts={weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false};
-    document.getElementById('topbar-clock').textContent=now.toLocaleString('en-AU',opts);
+    document.getElementById('topbar-clock').textContent=new Date().toLocaleString('en-AU',clockOpts);
   }
   updateClock(); setInterval(updateClock,1000);
   document.addEventListener('keydown',function(e){
