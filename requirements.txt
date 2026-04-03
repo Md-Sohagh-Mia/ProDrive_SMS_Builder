@@ -1,0 +1,16 @@
+# Core framework
+Django>=6.0,<7.0
+
+# MySQL database driver
+# Install the mysqlclient system dependency first:
+#   Ubuntu/Debian: sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+#   macOS (Homebrew): brew install mysql-client pkg-config
+mysqlclient>=2.2
+
+# Optional: use PyMySQL as a pure-Python alternative if mysqlclient cannot be compiled
+# PyMySQL>=1.1
+
+# Optional production extras
+# gunicorn>=21.2       # WSGI server for production
+# whitenoise>=6.7      # Serve static files efficiently
+# python-decouple>=3.8 # Load settings from .env files
