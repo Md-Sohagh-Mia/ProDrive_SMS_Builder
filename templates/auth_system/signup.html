@@ -1,0 +1,200 @@
+{% extends "auth_system/base.html" %}
+
+{% block title %}Register Your Company – PRODRIVE Compliance{% endblock %}
+
+{% block nav_right %}
+<a href="{% url 'auth_system:login' %}" class="btn-secondary-link">
+  <i class="bi bi-arrow-left"></i>Sign In
+</a>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.auth-card { max-width: 560px; }
+.auth-wrapper { align-items: flex-start; padding: 36px 16px 48px; }
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 22px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.strength-bar { height: 4px; border-radius: 99px; background: var(--border); margin-top: 8px; overflow: hidden; }
+.strength-fill { height: 100%; border-radius: 99px; transition: width .3s, background .3s; width: 0%; }
+.strength-text { font-size: 11px; margin-top: 4px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="text-center mb-4">
+      <div style="font-size:28px;font-weight:800;color:var(--primary);line-height:1">PRODRIVE</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">SMS Builder</div>
+    </div>
+
+    <h5 class="fw-bold mb-1" style="font-size:18px">Create your company account</h5>
+    <p style="font-size:14px;color:#64748b;margin-bottom:4px">Get started with PRODRIVE Compliance in minutes.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Company Info -->
+      <div class="section-label">Company Info</div>
+      <div class="row g-3">
+        <div class="col-sm-8">
+          <label class="form-label" for="{{ form.company_name.id_for_label }}">Company Name *</label>
+          {{ form.company_name }}
+          {% for error in form.company_name.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-sm-4">
+          <label class="form-label" for="{{ form.abn.id_for_label }}">ABN *</label>
+          {{ form.abn }}
+          {% for error in form.abn.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-3">
+        <label class="form-label" for="{{ form.address.id_for_label }}">Address</label>
+        {{ form.address }}
+      </div>
+
+      <!-- Contact Person -->
+      <div class="section-label">Contact Person</div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
+          {{ form.full_name }}
+          {% for error in form.full_name.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.role.id_for_label }}">Role / Position</label>
+          {{ form.role }}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email Address *</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.phone_number.id_for_label }}">Phone</label>
+          {{ form.phone_number }}
+          {% for error in form.phone_number.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="mt-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username *</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}
+          <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Security / Password -->
+      <div class="section-label">Security</div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.password1.id_for_label }}">Create Password *</label>
+          <input type="password"
+                 name="{{ form.password1.html_name }}"
+                 id="{{ form.password1.id_for_label }}"
+                 class="form-control{% if form.password1.errors %} is-invalid{% endif %}"
+                 placeholder="Min. 8 characters"
+                 autocomplete="new-password"
+                 oninput="checkStrength(this.value)">
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-text" id="strengthText"></div>
+          {% for error in form.password1.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password *</label>
+          <input type="password"
+                 name="{{ form.password2.html_name }}"
+                 id="{{ form.password2.id_for_label }}"
+                 class="form-control{% if form.password2.errors %} is-invalid{% endif %}"
+                 placeholder="Repeat password"
+                 autocomplete="new-password">
+          {% for error in form.password2.errors %}
+            <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <div class="d-flex align-items-start gap-2 mt-3">
+        <input type="checkbox"
+               name="{{ form.terms.html_name }}"
+               id="{{ form.terms.id_for_label }}"
+               style="accent-color:var(--primary);width:15px;height:15px;flex-shrink:0;margin-top:2px"
+               {% if form.terms.value %}checked{% endif %}>
+        <label for="{{ form.terms.id_for_label }}" style="font-size:13px;color:#64748b;cursor:pointer;line-height:1.5">
+          I agree to the
+          <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600">Terms of Service</a>
+          and
+          <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600">Privacy Policy</a>.
+        </label>
+      </div>
+      {% for error in form.terms.errors %}
+        <div style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+      {% endfor %}
+
+      <button type="submit" class="btn-auth mt-3">
+        <i class="bi bi-person-plus me-2"></i>Create Company Account
+      </button>
+
+      <div class="text-center mt-3" style="font-size:13px;color:#64748b">
+        Already registered?
+        <a href="{% url 'auth_system:login' %}" style="color:var(--primary);font-weight:600;text-decoration:none">Sign in</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function checkStrength(val) {
+  const fill = document.getElementById('strengthFill');
+  const text = document.getElementById('strengthText');
+  if (!val) { fill.style.width='0%'; text.textContent=''; return; }
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (val.length >= 12) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { w:'20%', bg:'#ef4444', label:'Weak' },
+    { w:'40%', bg:'#f97316', label:'Fair' },
+    { w:'60%', bg:'#eab308', label:'Good' },
+    { w:'80%', bg:'#22c55e', label:'Strong' },
+    { w:'100%', bg:'#10b981', label:'Very strong' },
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width = lvl.w;
+  fill.style.background = lvl.bg;
+  text.textContent = lvl.label;
+  text.style.color = lvl.bg;
+}
+</script>
+{% endblock %}
