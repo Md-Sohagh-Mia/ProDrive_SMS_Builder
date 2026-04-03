@@ -1,0 +1,138 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Dashboard – PRODRIVE Compliance{% endblock %}
+
+{% block extra_css %}
+.dashboard-wrapper {
+  flex: 1;
+  padding: 32px 16px 48px;
+  background: linear-gradient(140deg, #f0f7ff 0%, #f1f5f9 100%);
+}
+.dashboard-header {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px rgba(15,23,42,0.07);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 16px rgba(15,23,42,0.06);
+  border: 1px solid var(--border);
+  height: 100%;
+}
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+{% endblock %}
+
+{% block nav_action %}
+  <div class="d-flex align-items-center gap-3">
+    <span style="font-size:13px;color:#64748b">
+      <i class="bi bi-person-circle me-1"></i>{{ customer.get_short_name }}
+    </span>
+    <a href="{% url 'accounts:logout' %}" class="btn-back">
+      <i class="bi bi-box-arrow-right"></i>Sign Out
+    </a>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="dashboard-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h4 class="fw-bold mb-1" style="color:#0f172a">
+          Welcome back, {{ customer.get_short_name }}! 👋
+        </h4>
+        <p style="font-size:14px;color:#64748b;margin:0">
+          <i class="bi bi-building me-1"></i>{{ customer.company_name }}
+          {% if customer.role %} &nbsp;·&nbsp; {{ customer.role }}{% endif %}
+        </p>
+      </div>
+      <div class="auth-badge">
+        <i class="bi bi-check-circle-fill"></i>Active Account
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-envelope-paper"></i></div>
+          <div style="font-size:26px;font-weight:800;color:#0f172a">—</div>
+          <div style="font-size:13px;color:#64748b;margin-top:2px">SMS Campaigns</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-people"></i></div>
+          <div style="font-size:26px;font-weight:800;color:#0f172a">—</div>
+          <div style="font-size:13px;color:#64748b;margin-top:2px">Recipients</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fefce8;color:#ca8a04"><i class="bi bi-truck"></i></div>
+          <div style="font-size:26px;font-weight:800;color:#0f172a">—</div>
+          <div style="font-size:13px;color:#64748b;margin-top:2px">Vehicles Tracked</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fdf2f8;color:#a21caf"><i class="bi bi-bar-chart-line"></i></div>
+          <div style="font-size:26px;font-weight:800;color:#0f172a">—</div>
+          <div style="font-size:13px;color:#64748b;margin-top:2px">Reports Generated</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Details -->
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="stat-card">
+          <h6 class="fw-bold mb-3" style="color:#374151">
+            <i class="bi bi-building me-2" style="color:var(--primary)"></i>Company Details
+          </h6>
+          <table class="table table-sm mb-0" style="font-size:13px">
+            <tbody>
+              <tr><th style="width:40%;color:#64748b;font-weight:500">Company</th><td>{{ customer.company_name }}</td></tr>
+              {% if customer.abn %}<tr><th style="color:#64748b;font-weight:500">ABN</th><td>{{ customer.abn }}</td></tr>{% endif %}
+              {% if customer.address %}<tr><th style="color:#64748b;font-weight:500">Address</th><td>{{ customer.address }}</td></tr>{% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="stat-card">
+          <h6 class="fw-bold mb-3" style="color:#374151">
+            <i class="bi bi-person me-2" style="color:var(--primary)"></i>Contact Details
+          </h6>
+          <table class="table table-sm mb-0" style="font-size:13px">
+            <tbody>
+              <tr><th style="width:40%;color:#64748b;font-weight:500">Name</th><td>{{ customer.full_name }}</td></tr>
+              <tr><th style="color:#64748b;font-weight:500">Email</th><td>{{ customer.email }}</td></tr>
+              {% if customer.phone_number %}<tr><th style="color:#64748b;font-weight:500">Phone</th><td>{{ customer.phone_number }}</td></tr>{% endif %}
+              {% if customer.role %}<tr><th style="color:#64748b;font-weight:500">Role</th><td>{{ customer.role }}</td></tr>{% endif %}
+              <tr>
+                <th style="color:#64748b;font-weight:500">Member since</th>
+                <td>{{ customer.date_joined|date:"j M Y" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
