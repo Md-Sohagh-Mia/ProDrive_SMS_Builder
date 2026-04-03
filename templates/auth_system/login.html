@@ -1,0 +1,100 @@
+{% extends "auth_system/base.html" %}
+
+{% block title %}Sign In – PRODRIVE Compliance{% endblock %}
+
+{% block nav_right %}
+<a href="/" class="btn-secondary-link"><i class="bi bi-arrow-left"></i>Back to Home</a>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="text-center mb-4">
+      <div style="font-size:28px;font-weight:800;color:var(--primary);line-height:1">PRODRIVE</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">SMS Builder</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--primary);font-size:12px;font-weight:600;padding:5px 14px;border-radius:40px;margin-top:10px">
+        <i class="bi bi-building"></i>Company Portal
+      </div>
+    </div>
+
+    <h5 class="fw-bold mb-1" style="font-size:18px">Welcome back</h5>
+    <p style="font-size:14px;color:#64748b;margin-bottom:24px">Sign in to your company dashboard</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
+
+      <!-- Identifier -->
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.identifier.id_for_label }}">
+          {{ form.identifier.label }}
+        </label>
+        <div style="position:relative">
+          <i class="bi bi-envelope" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none"></i>
+          <input type="text"
+                 name="{{ form.identifier.html_name }}"
+                 id="{{ form.identifier.id_for_label }}"
+                 class="form-control{% if form.identifier.errors %} is-invalid{% endif %}"
+                 style="padding-left:40px"
+                 placeholder="company@email.com or username"
+                 value="{{ form.identifier.value|default:'' }}"
+                 autocomplete="username"
+                 autofocus>
+        </div>
+        {% for error in form.identifier.errors %}
+          <div class="invalid-feedback d-block" style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="form-label mb-0" for="{{ form.password.id_for_label }}">
+            {{ form.password.label }}
+          </label>
+          <a href="#" style="font-size:12px;color:var(--primary);text-decoration:none">Forgot password?</a>
+        </div>
+        <div style="position:relative">
+          <i class="bi bi-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none"></i>
+          <input type="password"
+                 name="{{ form.password.html_name }}"
+                 id="{{ form.password.id_for_label }}"
+                 class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+                 style="padding-left:40px"
+                 placeholder="Enter your password"
+                 autocomplete="current-password">
+        </div>
+        {% for error in form.password.errors %}
+          <div class="invalid-feedback d-block" style="font-size:12px;color:#ef4444;margin-top:4px">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Remember me -->
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <input type="checkbox"
+               name="{{ form.remember_me.html_name }}"
+               id="{{ form.remember_me.id_for_label }}"
+               style="accent-color:var(--primary);width:15px;height:15px"
+               {% if form.remember_me.value %}checked{% endif %}>
+        <label for="{{ form.remember_me.id_for_label }}" style="font-size:13px;color:#64748b;cursor:pointer">
+          {{ form.remember_me.label }}
+        </label>
+      </div>
+
+      <button type="submit" class="btn-auth">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Login to Dashboard
+      </button>
+    </form>
+
+    <div class="section-divider">or</div>
+
+    <div class="text-center" style="font-size:13px;color:#64748b">
+      New company? <a href="{% url 'auth_system:signup' %}" style="color:var(--primary);font-weight:600;text-decoration:none">Register here</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
