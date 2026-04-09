@@ -199,13 +199,15 @@ body {
       <div class="brand-title">PRODRIVE</div>
       <div class="brand-subtitle">SMS Builder</div>
     </a>
-    <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i>Back to Home</a>
+    <a href="{% url 'index' %}" class="btn-back"><i class="bi bi-arrow-left"></i>Back to Home</a>
   </div>
 </nav>
 
 <!-- MAIN -->
 <div class="auth-wrapper">
-  <div class="auth-card">
+  <!-- Fixed HTML form tag to wrap the whole card properly -->
+  <form method="POST" class="auth-card" onsubmit="return handleSignIn()">
+    {% csrf_token %}
 
     <div class="text-center mb-4">
       <div class="auth-brand-title">PRODRIVE</div>
@@ -221,46 +223,69 @@ body {
       <i class="bi bi-check-circle-fill me-2"></i>Signed in successfully! Redirecting…
     </div>
 
-    <div id="loginForm">
-      <div class="mb-3">
-        <label class="form-label" for="loginEmail">Company Email</label>
-        <div class="input-group">
-          <i class="bi bi-envelope input-icon"></i>
-          <input type="email" class="form-control" id="loginEmail" placeholder="company@email.com" autocomplete="email">
-        </div>
-        <div class="field-error" id="emailErr">Please enter a valid email address.</div>
+    {% if messages %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      {% for message in messages %}
+        Swal.fire({
+          icon: "{{ message.tags }}",
+          title: "{% if message.tags == 'success' %}Welcome{% else %}Login Failed{% endif %}",
+          text: "{{ message }}",
+          confirmButtonColor: "#2563eb",
+          showClass: {
+            popup: 'animate__animated animate__zoomIn'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOut'
+          }
+        }).then(() => {
+          {% if message.tags == 'success' %}
+            window.location.href = "{% url 'profile' %}";
+          {% endif %}
+        });
+      {% endfor %}
+    });
+    </script>
+    {% endif %}
+
+    <div class="mb-3">
+      <label class="form-label" for="loginEmail">Company Email</label>
+      <div class="input-group">
+        <i class="bi bi-envelope input-icon"></i>
+        <input type="email" class="form-control" name="email" id="loginEmail" placeholder="company@email.com" autocomplete="email">
       </div>
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-          <label class="form-label mb-0" for="loginPassword">Password</label>
-          <a href="#" style="font-size:12px;color:var(--primary);text-decoration:none">Forgot password?</a>
-        </div>
-        <div class="input-group">
-          <i class="bi bi-lock input-icon"></i>
-          <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
-        </div>
-        <div class="field-error" id="passErr">Please enter your password.</div>
-      </div>
-
-      <div class="d-flex align-items-center gap-2 mb-4">
-        <input type="checkbox" id="rememberMe" style="accent-color:var(--primary);width:15px;height:15px">
-        <label for="rememberMe" style="font-size:13px;color:#64748b;cursor:pointer">Remember me for 30 days</label>
-      </div>
-
-      <button class="btn-auth" onclick="handleSignIn()">
-        <span  id="btnSignInText">Login to Dashboard</span>
-        <span id="btnSignInLoad" style="display:none"><span class="spinner-border spinner-border-sm me-2"></span>Signing in…</span>
-      </button>
-
-      <div class="section-divider">or</div>
-
-      <div class="text-center" style="font-size:13px;color:#64748b">
-        New company? <a href="signup.html" style="color:var(--primary);font-weight:600;text-decoration:none">Register here</a>
-      </div>
+      <div class="field-error" id="emailErr">Please enter a valid email address.</div>
     </div>
 
-  </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="form-label mb-0" for="loginPassword">Password</label>
+        <a href="#" style="font-size:12px;color:var(--primary);text-decoration:none">Forgot password?</a>
+      </div>
+      <div class="input-group">
+        <i class="bi bi-lock input-icon"></i>
+        <input type="password" class="form-control" name="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+      <div class="field-error" id="passErr">Please enter your password.</div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mb-4">
+      <input type="checkbox" id="rememberMe" style="accent-color:var(--primary);width:15px;height:15px">
+      <label for="rememberMe" style="font-size:13px;color:#64748b;cursor:pointer">Remember me for 30 days</label>
+    </div>
+
+    <button id="loginBtn" class="btn-auth" type="submit">
+      <span id="btnSignInText">Login to Dashboard</span>
+      <span id="btnSignInLoad" style="display:none"><span class="spinner-border spinner-border-sm me-2"></span>Signing in…</span>
+    </button>
+
+    <div class="section-divider">or</div>
+
+    <div class="text-center" style="font-size:13px;color:#64748b">
+      New company? <a href="{% url 'signup' %}" style="color:var(--primary);font-weight:600;text-decoration:none">Register here</a>
+    </div>
+
+  </form>
 </div>
 
 <!-- FOOTER -->
@@ -269,38 +294,34 @@ body {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
 <script>
 function handleSignIn() {
   let valid = true;
 
+  // EMAIL VALIDATION
   const email = document.getElementById('loginEmail').value.trim();
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailOk = email.length > 0;
+
   document.getElementById('loginEmail').classList.toggle('error', !emailOk);
   document.getElementById('emailErr').classList.toggle('show', !emailOk);
+
   if (!emailOk) valid = false;
 
-  const pass = document.getElementById('loginPassword').value;
-  const passOk = pass.length >= 1;
+  // PASSWORD VALIDATION
+  const pass = document.getElementById('loginPassword').value.trim();
+  const passOk = pass.length > 0;
+
   document.getElementById('loginPassword').classList.toggle('error', !passOk);
   document.getElementById('passErr').classList.toggle('show', !passOk);
+
   if (!passOk) valid = false;
 
-  if (!valid) return;
-
-  document.getElementById('btnSignInText').style.display = 'none';
-  document.getElementById('btnSignInLoad').style.display = 'inline-flex';
-  document.querySelector('.btn-auth').disabled = true;
-
-  setTimeout(() => {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('loginSuccess').style.display = 'block';
-  }, 1200);
+  return valid;
 }
-
-// Enter key support
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleSignIn();
-});
 </script>
+
 </body>
 </html>
