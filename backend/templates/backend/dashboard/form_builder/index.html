@@ -1,0 +1,365 @@
+{% extends "backend/base.html" %}
+{% load static %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'backend/assets/css/form_builder.css' %}">
+<style>
+    /* Modal needs to be larger for TinyMCE */
+    .modal-box {
+        max-width: 900px;
+        width: 95%;
+    }
+    
+    /* Fix for modal scrolling */
+    .modal-bg.show .modal-box {
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+    
+    /* Editor styling */
+    .tox-tinymce {
+        margin-top: 5px;
+    }
+    
+    /* Dark theme for TinyMCE */
+        .tox .tox-editor-container {
+        background: #1f2937;
+    }
+    
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__overflow {
+        background: #1f2937 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="fb-breadcrumb">
+    <i class="bi bi-house"></i>
+    <span>Form Builder</span>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div>
+            <div class="card-title">
+                <i class="bi bi-layers-fill"></i>SMS Profile Form Builder
+                <span class="badge b-blue">{{ tabs|length }} tabs</span>
+            </div>
+            <div class="card-sub">Manage tab titles, section descriptions, and the checkbox options shown to companies when they fill in their profile.</div>
+        </div>
+    </div>
+</div>
+
+{% for tab in tabs %}
+<div class="fb-tab-card">
+    <div class="fb-tab-head">
+        <div style="flex:1; min-width:240px;">
+            <div class="fb-tab-title">
+                <i class="bi bi-bookmark-fill" style="color:#60a5fa;"></i>{{ tab.title }}
+                <span class="badge b-gray">{{ tab.key }}</span>
+            </div>
+            {% if tab.description %}
+            <div class="fb-tab-desc">{{ tab.description|striptags|truncatechars:150 }}</div>
+            {% else %}
+            <div class="fb-tab-desc" style="font-style:italic;">No description set — used in generated PDFs.</div>
+            {% endif %}
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openTabModal({{ tab.id }}, '{{ tab.title|escapejs }}', `{{ tab.description|escapejs }}`)">
+            <i class="bi bi-pencil"></i>Edit Tab
+        </button>
+    </div>
+
+    {% for section in tab.sections.all %}
+    <div class="fb-section-row">
+        <div class="fb-section-info">
+            <div class="fb-section-name">
+                <i class="bi bi-list-check" style="color:#9ca3af;"></i>{{ section.title }}
+                {% if section.has_categories %}
+                    <span class="badge b-amber">categories</span>
+                {% endif %}
+            </div>
+            <div class="fb-section-meta">
+                key: <span style="font-family:monospace;">{{ section.key }}</span> ·
+                {{ section.option_count }} option{{ section.option_count|pluralize }}
+                {% if section.has_categories %} · {{ section.category_count }} categor{{ section.category_count|pluralize:"y,ies" }}{% endif %}
+                {% if section.description %} · description set{% else %} · <span style="color:#f87171;">no description</span>{% endif %}
+            </div>
+        </div>
+        <div class="fb-section-actions">
+            <button class="btn btn-ghost btn-sm"
+                    onclick="openSectionModal({{ section.id }}, '{{ section.title|escapejs }}', `{{ section.description|escapejs }}`)">
+                <i class="bi bi-pencil"></i>Edit
+            </button>
+            <a class="btn btn-primary btn-sm" href="{% url 'admin_form_builder_section' section.key %}">
+                <i class="bi bi-gear"></i>Manage Options
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">No sections defined under this tab.</div>
+    {% endfor %}
+</div>
+{% empty %}
+<div class="card">
+    <div class="empty-state">
+        <i class="bi bi-exclamation-triangle"></i>
+        <p>No tabs found. Refresh this page once to auto-seed predefined tabs and sections.</p>
+    </div>
+</div>
+{% endfor %}
+
+<!-- ── EDIT TAB MODAL ── -->
+<div class="modal-bg" id="tabModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <span><i class="bi bi-pencil-square"></i> Edit Tab</span>
+            <button class="modal-close" onclick="closeModal('tabModal')">&times;</button>
+        </div>
+        <input type="hidden" id="tabId">
+        <div class="field-row">
+            <div class="field">
+                <label>Title <span class="required">*</span></label>
+                <input id="tabTitle" placeholder="Tab title">
+            </div>
+        </div>
+        <div class="field-row full">
+            <div class="field">
+                <label>Description <span style="color:#6b7280;font-weight:400;">(shown in generated PDF)</span></label>
+                <textarea id="tabDescription" rows="10" placeholder="Describe what this section of the SMS covers..."></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('tabModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTab()"><i class="bi bi-check-lg"></i>Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── EDIT SECTION MODAL ── -->
+<div class="modal-bg" id="sectionModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <span><i class="bi bi-pencil-square"></i> Edit Section</span>
+            <button class="modal-close" onclick="closeModal('sectionModal')">&times;</button>
+        </div>
+        <input type="hidden" id="sectionId">
+        <div class="field-row">
+            <div class="field">
+                <label>Title <span class="required">*</span></label>
+                <input id="sectionTitle" placeholder="Section title">
+            </div>
+        </div>
+        <div class="field-row full">
+            <div class="field">
+                <label>Description <span style="color:#6b7280;font-weight:400;">(shown in generated PDF)</span></label>
+                <textarea id="sectionDescription" rows="10" placeholder="Describe what this section covers..."></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('sectionModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveSection()"><i class="bi bi-check-lg"></i>Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- TinyMCE CDN -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
+
+<script>
+// TinyMCE instances
+let tabDescriptionEditor = null;
+let sectionDescriptionEditor = null;
+
+function getCookie(name) {
+    let v = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(c => {
+            const t = c.trim();
+            if (t.startsWith(name + '=')) v = decodeURIComponent(t.substring(name.length + 1));
+        });
+    }
+    return v;
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = 'toast-message';
+    t.style.borderLeftColor = type === 'success' ? '#10b981' : '#ef4444';
+    t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i> ${msg}`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function closeModal(id) { 
+    const modal = document.getElementById(id);
+    modal.classList.remove('show');
+    
+    // Remove TinyMCE instances when closing
+    if (id === 'tabModal' && tabDescriptionEditor) {
+        tinymce.remove(tabDescriptionEditor);
+        tabDescriptionEditor = null;
+    }
+    if (id === 'sectionModal' && sectionDescriptionEditor) {
+        tinymce.remove(sectionDescriptionEditor);
+        sectionDescriptionEditor = null;
+    }
+}
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+    m.addEventListener('click', e => { 
+        if (e.target === m) closeModal(m.id);
+    });
+});
+
+// Initialize TinyMCE for tab description
+function initTabDescriptionEditor(initialData = '') {
+    const textarea = document.getElementById('tabDescription');
+    if (!textarea) return;
+    
+    if (tabDescriptionEditor) {
+        tinymce.remove(tabDescriptionEditor);
+    }
+    
+    tinymce.init({
+        selector: '#tabDescription',
+        height: 400,
+        menubar: true,
+        plugins: 'table advtable link image media lists code help wordcount',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | link image media | code',
+        setup: function(editor) {
+            tabDescriptionEditor = editor;
+            editor.on('init', function() {
+                editor.setContent(initialData);
+            });
+            editor.on('change', function() {
+                editor.save();
+            });
+        },
+        content_style: 'body { background: #111827; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }'
+    });
+}
+
+// Initialize TinyMCE for section description
+function initSectionDescriptionEditor(initialData = '') {
+    const textarea = document.getElementById('sectionDescription');
+    if (!textarea) return;
+    
+    if (sectionDescriptionEditor) {
+        tinymce.remove(sectionDescriptionEditor);
+    }
+    
+    tinymce.init({
+        selector: '#sectionDescription',
+        height: 400,
+        menubar: true,
+        plugins: 'table advtable link image media lists code help wordcount',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | link image media | code',
+        setup: function(editor) {
+            sectionDescriptionEditor = editor;
+            editor.on('init', function() {
+                editor.setContent(initialData);
+            });
+            editor.on('change', function() {
+                editor.save();
+            });
+        },
+        content_style: 'body { background: #111827; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }'
+    });
+}
+
+// ── Tab ──
+function openTabModal(id, title, description) {
+    document.getElementById('tabId').value = id;
+    document.getElementById('tabTitle').value = title;
+    
+    // Clear and set textarea content
+    const textarea = document.getElementById('tabDescription');
+    textarea.value = description || '';
+    
+    // Initialize TinyMCE
+    setTimeout(() => {
+        initTabDescriptionEditor(description || '');
+    }, 100);
+    
+    document.getElementById('tabModal').classList.add('show');
+}
+
+async function saveTab() {
+    const id = document.getElementById('tabId').value;
+    
+    // Get description from TinyMCE if available
+    let description = document.getElementById('tabDescription').value;
+    if (tabDescriptionEditor) {
+        description = tabDescriptionEditor.getContent();
+    }
+    
+    const payload = {
+        title: document.getElementById('tabTitle').value.trim(),
+        description: description,
+    };
+    if (!payload.title) { showToast('Title is required', 'error'); return; }
+    try {
+        const r = await fetch(`/admin/form-builder/api/tab/${id}/update/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast('Tab updated');
+            closeModal('tabModal');
+            setTimeout(() => location.reload(), 600);
+        } else { showToast(data.error || 'Save failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+
+// ── Section ──
+function openSectionModal(id, title, description) {
+    document.getElementById('sectionId').value = id;
+    document.getElementById('sectionTitle').value = title;
+    
+    // Clear and set textarea content
+    const textarea = document.getElementById('sectionDescription');
+    textarea.value = description || '';
+    
+    // Initialize TinyMCE
+    setTimeout(() => {
+        initSectionDescriptionEditor(description || '');
+    }, 100);
+    
+    document.getElementById('sectionModal').classList.add('show');
+}
+
+async function saveSection() {
+    const id = document.getElementById('sectionId').value;
+    
+    // Get description from TinyMCE if available
+    let description = document.getElementById('sectionDescription').value;
+    if (sectionDescriptionEditor) {
+        description = sectionDescriptionEditor.getContent();
+    }
+    
+    const payload = {
+        title: document.getElementById('sectionTitle').value.trim(),
+        description: description,
+    };
+    if (!payload.title) { showToast('Title is required', 'error'); return; }
+    try {
+        const r = await fetch(`/admin/form-builder/api/section/${id}/update/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast('Section updated');
+            closeModal('sectionModal');
+            setTimeout(() => location.reload(), 600);
+        } else { showToast(data.error || 'Save failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+</script>
+{% endblock %}

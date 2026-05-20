@@ -1,0 +1,265 @@
+/* ── Theme base (mirrors driver-list example) ── */
+body { background: #0a0a0a; }
+
+.card {
+    background: #141c2e;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    margin-bottom: 20px;
+}
+.card-head {
+    padding: 14px 20px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d0d0d;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* ── Buttons ── */
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); color: white; }
+.btn-ghost { background: transparent; border: 1px solid #2a2a2a; color: #9ca3af; }
+.btn-ghost:hover { background: #1a1a1a; color: white; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-success { background: #10b981; color: white; }
+.btn-success:hover { background: #059669; }
+.btn-sm { padding: 4px 8px; font-size: 11px; }
+
+/* ── Badges ── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+.b-green { background: #064e3b; color: #34d399; }
+.b-amber { background: #451a03; color: #fbbf24; }
+.b-red   { background: #7f1d1d; color: #f87171; }
+.b-blue  { background: #1e3a5f; color: #60a5fa; }
+.b-gray  { background: #1f2937; color: #9ca3af; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+/* ── Tables ── */
+.dt { width: 100%; border-collapse: collapse; }
+.dt tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 12px;
+    vertical-align: middle;
+    color: #e5e7eb;
+}
+.dt thead th {
+    padding: 12px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    border-bottom: 1px solid #2a2a2a;
+    background: #0d0d0d;
+    text-align: left;
+}
+.tbl-wrap { overflow-x: auto; }
+
+/* ── Modals ── */
+.modal-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s;
+}
+.modal-bg.show { opacity: 1; visibility: visible; }
+.modal-box {
+    background: #141c2e;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid #2a2a2a;
+}
+.modal-title {
+    padding: 16px 20px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 16px; font-weight: 700; color: #ffffff;
+    background: #0d0d0d;
+}
+.modal-close {
+    background: none; border: none;
+    font-size: 24px; cursor: pointer; color: #9ca3af;
+}
+.field-row {
+    display: flex; gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #2a2a2a;
+    background: #141c2e;
+}
+.field-row.full { flex-direction: column; }
+.field { flex: 1; }
+.field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+.field input, .field select, .field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: inherit;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; }
+.field .inline-check {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #e5e7eb; cursor: pointer;
+}
+.field .inline-check input { width: auto; }
+.modal-actions {
+    padding: 16px 20px;
+    display: flex; justify-content: flex-end; gap: 10px;
+    background: #141c2e;
+    border-top: 1px solid #2a2a2a;
+}
+.required { color: #ef4444; }
+
+/* ── Toast ── */
+.toast-message {
+    background: #1a1a1a;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 8px;
+    border-left: 3px solid;
+    color: white;
+    position: fixed; top: 20px; right: 20px;
+    z-index: 9999; font-size: 12px;
+    animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(100px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Form-builder-specific ── */
+.fb-breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    color: #9ca3af; font-size: 12px;
+    margin-bottom: 16px;
+}
+.fb-breadcrumb a { color: #60a5fa; text-decoration: none; }
+.fb-breadcrumb a:hover { text-decoration: underline; }
+
+.fb-tab-card {
+    background: #141c2e;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.fb-tab-head {
+    padding: 14px 20px;
+    background: #0d0d0d;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 10px; flex-wrap: wrap;
+}
+.fb-tab-title {
+    font-size: 15px; font-weight: 700; color: #ffffff;
+    display: flex; align-items: center; gap: 8px;
+}
+.fb-tab-desc {
+    font-size: 12px; color: #9ca3af; margin-top: 6px;
+    line-height: 1.5;
+}
+
+.fb-section-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid #2a2a2a;
+    transition: background 0.15s;
+    gap: 12px; flex-wrap: wrap;
+}
+.fb-section-row:last-child { border-bottom: none; }
+.fb-section-row:hover { background: #1a1a1a; }
+.fb-section-info { flex: 1; min-width: 200px; }
+.fb-section-name {
+    font-size: 13px; font-weight: 600; color: #e5e7eb;
+    display: flex; align-items: center; gap: 6px;
+}
+.fb-section-meta { font-size: 11px; color: #6b7280; margin-top: 3px; }
+.fb-section-actions { display: flex; gap: 6px; }
+
+/* Category accordion (NHVR) */
+.fb-category {
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.fb-cat-head {
+    padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    background: #141c2e;
+    border-bottom: 1px solid #2a2a2a;
+    gap: 10px;
+}
+.fb-cat-title {
+    font-size: 13px; font-weight: 600; color: #ffffff;
+    display: flex; align-items: center; gap: 8px;
+}
+.fb-cat-body { padding: 8px 0; }
+.fb-cat-body table { width: 100%; }
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+    font-size: 13px;
+}
+.empty-state i { font-size: 36px; color: #4a4a4a; margin-bottom: 8px; display: block; }

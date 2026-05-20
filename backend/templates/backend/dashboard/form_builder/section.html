@@ -1,0 +1,630 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load admin_extras %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'backend/assets/css/form_builder.css' %}">
+<style>
+    /* Modal needs to be larger for editor */
+    .modal-box {
+        max-width: 1000px;
+        width: 95%;
+    }
+    
+    /* Fix for modal scrolling */
+    .modal-bg.show .modal-box {
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+    
+    /* Editor styling */
+    .tox-tinymce {
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="fb-breadcrumb">
+    <i class="bi bi-house"></i>
+    <a href="{% url 'admin_form_builder_index' %}">Form Builder</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>{{ section.tab.title }}</span>
+    <i class="bi bi-chevron-right"></i>
+    <span style="color:#e5e7eb;">{{ section.title }}</span>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <div style="flex:1; min-width:240px;">
+            <div class="card-title">
+                <i class="bi bi-list-check"></i>{{ section.title }}
+                {% if section.has_categories %}<span class="badge b-amber">categories</span>{% endif %}
+                <span class="badge b-gray">{{ section.key }}</span>
+            </div>
+            <div class="card-sub">
+                Under tab <strong style="color:#e5e7eb;">{{ section.tab.title }}</strong>.
+                {% if section.description %}{{ section.description }}{% else %}<em>No description set — used in generated PDFs.</em>{% endif %}
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            {% if section.has_categories %}
+            <button class="btn btn-ghost" onclick="openCategoryModal()">
+                <i class="bi bi-folder-plus"></i>Add Category
+            </button>
+            {% endif %}
+            <button class="btn btn-primary" onclick="openOptionModal()">
+                <i class="bi bi-plus-lg"></i>Add Option
+            </button>
+        </div>
+    </div>
+</div>
+
+{# ─────── BRANCH A: Sections WITHOUT categories (flat list) ─────── #}
+{% if not section.has_categories %}
+<div class="card">
+    <div class="card-head">
+        <div class="card-title">
+            <i class="bi bi-check2-square"></i>Checkbox Options
+            <span class="badge b-blue">{{ options|length }}</span>
+        </div>
+    </div>
+    <div class="tbl-wrap">
+        <table class="dt">
+            <thead>
+                <tr>
+                    <th style="width:60px;">Order</th>
+                    <th>Label</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                    {% if section.key == 'accreditations' %}<th style="width:90px;">Needs Date</th>{% endif %}
+                    <th style="width:80px;">Active</th>
+                    <th style="width:130px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for opt in options %}
+                <tr data-id="{{ opt.id }}">
+                    <td style="font-family:monospace;">{{ opt.order }}</td>
+                    <td><strong style="color:#ffffff;">{{ opt.label }}</strong></td>
+                    <td style="font-family:monospace; color:#9ca3af;">{{ opt.value }}</td>
+                    <td style="max-width:340px; color:#9ca3af;">
+                        {{ opt.description|striptags|truncatechars:80|default:"—" }}
+                    </td>
+                    {% if section.key == 'accreditations' %}
+                    <td>{% if opt.requires_date %}<span class="badge b-amber">Yes</span>{% else %}<span class="badge b-gray">No</span>{% endif %}</td>
+                    {% endif %}
+                    <td>
+                        {% if opt.is_active %}
+                            <span class="badge b-green"><span class="dot"></span>Active</span>
+                        {% else %}
+                            <span class="badge b-red"><span class="dot"></span>Off</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-ghost btn-sm" onclick='editOption({{ opt.id }}, {{ opt|json_dump }})'>
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteOption({{ opt.id }})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if section.key == 'accreditations' %}7{% else %}6{% endif %}">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No options yet. Click <strong>Add Option</strong> to create the first one.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ─────── BRANCH B: Sections WITH categories (NHVR) ─────── #}
+{% else %}
+{% for cat in categories %}
+<div class="fb-category" data-cat-id="{{ cat.id }}">
+    <div class="fb-cat-head">
+        <div>
+            <div class="fb-cat-title">
+                <i class="bi bi-folder-fill" style="color:#fbbf24;"></i>{{ cat.name }}
+                <span class="badge b-blue">{{ cat.options.count }} option{{ cat.options.count|pluralize }}</span>
+                {% if not cat.is_active %}<span class="badge b-red">disabled</span>{% endif %}
+            </div>
+            {% if cat.description %}<div class="fb-section-meta" style="margin-top:4px;">{{ cat.description|striptags|truncatechars:100 }}</div>{% endif %}
+        </div>
+        <div style="display:flex; gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="openOptionModal({{ cat.id }})">
+                <i class="bi bi-plus-lg"></i>Add Option
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick='editCategory({{ cat.id }}, {{ cat|json_dump_cat }})'>
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCategory({{ cat.id }})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    <div class="fb-cat-body">
+        <div class="tbl-wrap">
+            <table class="dt">
+                <thead>
+                    <tr>
+                        <th style="width:60px;">Order</th>
+                        <th>Label</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                        <th style="width:80px;">Active</th>
+                        <th style="width:130px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opt in cat.options.all %}
+                    <tr>
+                        <td style="font-family:monospace;">{{ opt.order }}</td>
+                        <td><strong style="color:#ffffff;">{{ opt.label }}</strong></td>
+                        <td style="font-family:monospace; color:#9ca3af;">{{ opt.value }}</td>
+                        <td style="max-width:340px; color:#9ca3af;">{{ opt.description|striptags|truncatechars:80|default:"—" }}</td>
+                        <td>
+                            {% if opt.is_active %}<span class="badge b-green"><span class="dot"></span>Active</span>
+                            {% else %}<span class="badge b-red"><span class="dot"></span>Off</span>{% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-ghost btn-sm" onclick='editOption({{ opt.id }}, {{ opt|json_dump }})'>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteOption({{ opt.id }})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6"><div class="empty-state" style="padding:20px;">No options in this category yet.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <div class="empty-state">
+        <i class="bi bi-folder2-open"></i>
+        <p>No categories yet. Click <strong>Add Category</strong> to create the first one (e.g. "1. Common Rigid Trucks – General Access").</p>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── ADD/EDIT OPTION MODAL ── -->
+<div class="modal-bg" id="optionModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <span id="optionModalTitle"><i class="bi bi-plus-circle"></i> Add Checkbox Option</span>
+            <button class="modal-close" onclick="closeModal('optionModal')">&times;</button>
+        </div>
+        <input type="hidden" id="optionId">
+        <input type="hidden" id="optionCategoryId">
+
+        <div class="field-row">
+            <div class="field">
+                <label>Label <span class="required">*</span></label>
+                <input id="optionLabel" placeholder="e.g. Dangerous Goods (DG licence held)" oninput="autoFillValue()">
+            </div>
+            <div class="field">
+                <label>Value <span class="required">*</span></label>
+                <input id="optionValue" placeholder="auto-generated from label" style="font-family:monospace;">
+            </div>
+        </div>
+
+        <div class="field-row full">
+            <div class="field">
+                <label>Description <span style="color:#6b7280;font-weight:400;">(used in generated PDF)</span></label>
+                <textarea id="optionDescription" rows="10" placeholder="Detailed description shown in the PDF when a company selects this option..."></textarea>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label>Order</label>
+                <input id="optionOrder" type="number" value="0">
+            </div>
+            {% if section.key == 'accreditations' %}
+            <div class="field">
+                <label>&nbsp;</label>
+                <label class="inline-check">
+                    <input type="checkbox" id="optionRequiresDate">
+                    Requires audit date
+                </label>
+            </div>
+            {% endif %}
+            <div class="field">
+                <label>&nbsp;</label>
+                <label class="inline-check">
+                    <input type="checkbox" id="optionIsActive" checked>
+                    Active (visible in form)
+                </label>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('optionModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveOption()"><i class="bi bi-check-lg"></i>Save Option</button>
+        </div>
+    </div>
+</div>
+
+{% if section.has_categories %}
+<!-- ── ADD/EDIT CATEGORY MODAL ── -->
+<div class="modal-bg" id="categoryModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <span id="categoryModalTitle"><i class="bi bi-folder-plus"></i> Add Category</span>
+            <button class="modal-close" onclick="closeModal('categoryModal')">&times;</button>
+        </div>
+        <input type="hidden" id="categoryId">
+        <div class="field-row">
+            <div class="field">
+                <label>Name <span class="required">*</span></label>
+                <input id="categoryName" placeholder="e.g. 1. Common Rigid Trucks – General Access">
+            </div>
+        </div>
+        <div class="field-row full">
+            <div class="field">
+                <label>Description <span style="color:#6b7280;font-weight:400;">(used as category heading in PDF)</span></label>
+                <textarea id="categoryDescription" rows="5" placeholder="Describe this category..."></textarea>
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Order</label>
+                <input id="categoryOrder" type="number" value="0">
+            </div>
+            <div class="field">
+                <label>&nbsp;</label>
+                <label class="inline-check">
+                    <input type="checkbox" id="categoryIsActive" checked>
+                    Active
+                </label>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('categoryModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveCategory()"><i class="bi bi-check-lg"></i>Save Category</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- TinyMCE CDN -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
+
+<script>
+const SECTION_ID = {{ section.id }};
+const SECTION_HAS_CATEGORIES = {{ section.has_categories|yesno:"true,false" }};
+const SECTION_KEY = "{{ section.key }}";
+
+// TinyMCE instances
+let optionDescriptionEditor = null;
+let categoryDescriptionEditor = null;
+
+function getCookie(name) {
+    let v = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(c => {
+            const t = c.trim();
+            if (t.startsWith(name + '=')) v = decodeURIComponent(t.substring(name.length + 1));
+        });
+    }
+    return v;
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = 'toast-message';
+    t.style.borderLeftColor = type === 'success' ? '#10b981' : '#ef4444';
+    t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'}"></i> ${msg}`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function closeModal(id) { 
+    const modal = document.getElementById(id);
+    modal.classList.remove('show');
+    
+    // Remove TinyMCE instances when closing
+    if (id === 'optionModal' && optionDescriptionEditor) {
+        tinymce.remove(optionDescriptionEditor);
+        optionDescriptionEditor = null;
+    }
+    if (id === 'categoryModal' && categoryDescriptionEditor) {
+        tinymce.remove(categoryDescriptionEditor);
+        categoryDescriptionEditor = null;
+    }
+}
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+    m.addEventListener('click', e => { 
+        if (e.target === m) closeModal(m.id);
+    });
+});
+
+// Initialize TinyMCE for option description
+function initOptionDescriptionEditor(initialData = '') {
+    const textarea = document.getElementById('optionDescription');
+    if (!textarea) return;
+    
+    if (optionDescriptionEditor) {
+        tinymce.remove(optionDescriptionEditor);
+    }
+    
+    tinymce.init({
+        selector: '#optionDescription',
+        height: 400,
+        menubar: true,
+        plugins: 'table advtable link image media lists code help wordcount',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | link image media | code',
+        setup: function(editor) {
+            optionDescriptionEditor = editor;
+            editor.on('init', function() {
+                editor.setContent(initialData);
+            });
+            editor.on('change', function() {
+                editor.save();
+            });
+        },
+        content_style: 'body { background: #111827; color: #e5e7eb; }'
+    });
+}
+
+// Initialize TinyMCE for category description
+function initCategoryDescriptionEditor(initialData = '') {
+    const textarea = document.getElementById('categoryDescription');
+    if (!textarea) return;
+    
+    if (categoryDescriptionEditor) {
+        tinymce.remove(categoryDescriptionEditor);
+    }
+    
+    tinymce.init({
+        selector: '#categoryDescription',
+        height: 300,
+        menubar: true,
+        plugins: 'table advtable link lists code help wordcount',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | table | link | code',
+        setup: function(editor) {
+            categoryDescriptionEditor = editor;
+            editor.on('init', function() {
+                editor.setContent(initialData);
+            });
+            editor.on('change', function() {
+                editor.save();
+            });
+        },
+        content_style: 'body { background: #111827; color: #e5e7eb; }'
+    });
+}
+
+// Slugify-style helper
+function slugify(s) {
+    return s.toLowerCase().trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '_')
+        .replace(/^-+|-+$/g, '');
+}
+
+let _valueManuallyEdited = false;
+document.addEventListener('DOMContentLoaded', () => {
+    const valEl = document.getElementById('optionValue');
+    if (valEl) {
+        valEl.addEventListener('input', () => { _valueManuallyEdited = true; });
+    }
+});
+
+function autoFillValue() {
+    if (_valueManuallyEdited) return;
+    const label = document.getElementById('optionLabel').value;
+    document.getElementById('optionValue').value = slugify(label);
+}
+
+// ── OPTION CRUD ──
+function openOptionModal(categoryId = null) {
+    document.getElementById('optionModalTitle').innerHTML = '<i class="bi bi-plus-circle"></i> Add Checkbox Option';
+    document.getElementById('optionId').value = '';
+    document.getElementById('optionCategoryId').value = categoryId || '';
+    document.getElementById('optionLabel').value = '';
+    document.getElementById('optionValue').value = '';
+    document.getElementById('optionOrder').value = 0;
+    if (document.getElementById('optionRequiresDate')) document.getElementById('optionRequiresDate').checked = false;
+    document.getElementById('optionIsActive').checked = true;
+    _valueManuallyEdited = false;
+    
+    // Clear and reinitialize textarea
+    const textarea = document.getElementById('optionDescription');
+    textarea.value = '';
+    
+    // Initialize TinyMCE
+    setTimeout(() => {
+        initOptionDescriptionEditor('');
+    }, 100);
+    
+    document.getElementById('optionModal').classList.add('show');
+}
+
+function editOption(id, opt) {
+    document.getElementById('optionModalTitle').innerHTML = '<i class="bi bi-pencil-square"></i> Edit Option';
+    document.getElementById('optionId').value = id;
+    document.getElementById('optionCategoryId').value = opt.category_id || '';
+    document.getElementById('optionLabel').value = opt.label;
+    document.getElementById('optionValue').value = opt.value;
+    document.getElementById('optionOrder').value = opt.order;
+    if (document.getElementById('optionRequiresDate')) document.getElementById('optionRequiresDate').checked = !!opt.requires_date;
+    document.getElementById('optionIsActive').checked = !!opt.is_active;
+    _valueManuallyEdited = true;
+    
+    // Clear and reinitialize textarea with content
+    const textarea = document.getElementById('optionDescription');
+    textarea.value = opt.description || '';
+    
+    // Initialize TinyMCE with existing content
+    setTimeout(() => {
+        initOptionDescriptionEditor(opt.description || '');
+    }, 100);
+    
+    document.getElementById('optionModal').classList.add('show');
+}
+
+async function saveOption() {
+    const id = document.getElementById('optionId').value;
+    
+    // Get description from TinyMCE if available
+    let description = document.getElementById('optionDescription').value;
+    if (optionDescriptionEditor) {
+        description = optionDescriptionEditor.getContent();
+    }
+    
+    const payload = {
+        section_id: SECTION_ID,
+        category_id: document.getElementById('optionCategoryId').value || null,
+        label: document.getElementById('optionLabel').value.trim(),
+        value: document.getElementById('optionValue').value.trim(),
+        description: description,
+        order: parseInt(document.getElementById('optionOrder').value || 0, 10),
+        is_active: document.getElementById('optionIsActive').checked,
+        requires_date: document.getElementById('optionRequiresDate')
+                       ? document.getElementById('optionRequiresDate').checked : false,
+    };
+    if (!payload.label) { showToast('Label is required', 'error'); return; }
+    if (!payload.value) { showToast('Value is required', 'error'); return; }
+    if (SECTION_HAS_CATEGORIES && !payload.category_id) {
+        showToast('Category is required for this section', 'error'); return;
+    }
+
+    const url = id
+        ? `/admin/form-builder/api/option/${id}/update/`
+        : `/admin/form-builder/api/option/create/`;
+    try {
+        const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast(id ? 'Option updated' : 'Option created');
+            closeModal('optionModal');
+            setTimeout(() => location.reload(), 600);
+        } else { showToast(data.error || 'Save failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+
+async function deleteOption(id) {
+    if (!confirm('Delete this option? Any company already linked to it will lose the selection.')) return;
+    try {
+        const r = await fetch(`/admin/form-builder/api/option/${id}/delete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast('Option deleted');
+            setTimeout(() => location.reload(), 500);
+        } else { showToast(data.error || 'Delete failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+
+{% if section.has_categories %}
+// ── CATEGORY CRUD ──
+function openCategoryModal() {
+    document.getElementById('categoryModalTitle').innerHTML = '<i class="bi bi-folder-plus"></i> Add Category';
+    document.getElementById('categoryId').value = '';
+    document.getElementById('categoryName').value = '';
+    document.getElementById('categoryOrder').value = 0;
+    document.getElementById('categoryIsActive').checked = true;
+    
+    const textarea = document.getElementById('categoryDescription');
+    textarea.value = '';
+    
+    setTimeout(() => {
+        initCategoryDescriptionEditor('');
+    }, 100);
+    
+    document.getElementById('categoryModal').classList.add('show');
+}
+
+function editCategory(id, cat) {
+    document.getElementById('categoryModalTitle').innerHTML = '<i class="bi bi-pencil-square"></i> Edit Category';
+    document.getElementById('categoryId').value = id;
+    document.getElementById('categoryName').value = cat.name;
+    document.getElementById('categoryOrder').value = cat.order;
+    document.getElementById('categoryIsActive').checked = !!cat.is_active;
+    
+    const textarea = document.getElementById('categoryDescription');
+    textarea.value = cat.description || '';
+    
+    setTimeout(() => {
+        initCategoryDescriptionEditor(cat.description || '');
+    }, 100);
+    
+    document.getElementById('categoryModal').classList.add('show');
+}
+
+async function saveCategory() {
+    const id = document.getElementById('categoryId').value;
+    
+    let description = document.getElementById('categoryDescription').value;
+    if (categoryDescriptionEditor) {
+        description = categoryDescriptionEditor.getContent();
+    }
+    
+    const payload = {
+        section_id: SECTION_ID,
+        name: document.getElementById('categoryName').value.trim(),
+        description: description,
+        order: parseInt(document.getElementById('categoryOrder').value || 0, 10),
+        is_active: document.getElementById('categoryIsActive').checked,
+    };
+    if (!payload.name) { showToast('Name is required', 'error'); return; }
+
+    const url = id
+        ? `/admin/form-builder/api/category/${id}/update/`
+        : `/admin/form-builder/api/category/create/`;
+    try {
+        const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast(id ? 'Category updated' : 'Category created');
+            closeModal('categoryModal');
+            setTimeout(() => location.reload(), 600);
+        } else { showToast(data.error || 'Save failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+
+async function deleteCategory(id) {
+    if (!confirm('Delete this category and ALL options inside it?')) return;
+    try {
+        const r = await fetch(`/admin/form-builder/api/category/${id}/delete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        });
+        const data = await r.json();
+        if (data.success) {
+            showToast('Category deleted');
+            setTimeout(() => location.reload(), 500);
+        } else { showToast(data.error || 'Delete failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
+}
+{% endif %}
+</script>
+{% endblock %}
